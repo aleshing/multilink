@@ -1,9 +1,25 @@
-create_comparison_data <- function(records, types, breaks){
+#' Create Comparison Data
+#'
+#' Description goes here.
+#'
+#' @param records
+#' @param types
+#' @param breaks
+#' @param file_sizes The size of each file
+#' @param duplicates Indicators of whether each file possibly has duplicates
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_comparison_data <- function(records, types, breaks, file_sizes,
+                                   duplicates){
     r <- nrow(records)
+    FF <- ncol(records)
+    # Edit the following lines to handle no duplicates in some files
     record_pairs <- t(utils::combn(r, 2))
     rps1 <- record_pairs[, 1]
     rps2 <- record_pairs[, 1]
-    FF <- ncol(records)
 
     comparisons <- matrix(0, nrow = ncol(record_pairs), ncol = (2 + FF))
     comparisons[, 1:2] <- record_pairs
