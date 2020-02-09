@@ -4,15 +4,59 @@
 \alias{create_comparison_data}
 \title{Create Comparison Data}
 \usage{
-create_comparison_data(records, types, breaks, file_sizes, duplicates)
+create_comparison_data(records, types, breaks, K, file_sizes, duplicates)
 }
 \arguments{
-\item{file_sizes}{The size of each file}
+\item{records}{The records to be linked, of class \code{data.frame}.
+It's assumed that each column of \code{records} is a field to be compared,
+and that if there are multiple files (i.e. \code{K}>1), \code{records} is
+obtained by stacking the files on top of each other so that
+\code{records[1:file_sizes[1], ]} contains the records for file \code{1},
+\code{records[(file_sizes[1] + 1):(file_sizes[1] + file_sizes[2]), ]}
+contains the records for file \code{2}, and so on. Missing values should be
+coded as \code{NA}.}
 
-\item{duplicates}{Indicators of whether each file possibly has duplicates}
+\item{types}{A \code{character} vector, indicating the comparison to be used
+for each column of \code{records}. The options are: \code{"bi"} for
+binary comparisons, \code{"nu"} for numeric comparisons
+(absolute difference), and \code{"lv"} for string comparisons (normalized
+Levenshtein distance). We assume that fields using options \code{"bi"} and
+\code{"lv"} are  of class \code{character}, and fields using the \code{"nu"}
+option are of class \code{numeric}.}
+
+\item{breaks}{A \code{list}, the same length as \code{types}, indicating the
+break points used to compute disagreement levels for each fields'
+comparisons. If \code{types[f]=="bi"}, \code{breaks[[f]]} is ignored.}
+
+\item{K}{The number of files, assumed to be of class \code{numeric}.}
+
+\item{file_sizes}{A \code{numeric} vector of length \code{K}, indicating the
+size of each file.}
+
+\item{duplicates}{A \code{numeric} vector of length \code{K}, indicating
+which files have duplicates. \code{duplicates[k]} should be \code{1} if file
+\code{k} has duplicates, and \code{duplicates[k]} should be \code{0} if file
+\code{k} has no duplicates. If any files do not have duplicates, we strongly
+recommend that the largest such file is organized to be the first file.}
 }
 \value{
-
+a list containing:
+\describe{
+  \item{\code{record_pairs}}{}
+  \item{\code{comparisons}}{}
+  \item{\code{K}}{}
+  \item{\code{file_sizes}}{}
+  \item{\code{duplicates}}{}
+  \item{\code{field_levels}}{}
+  \item{\code{file_labels}}{}
+  \item{\code{rp_to_fp}}{}
+  \item{\code{ab}}{}
+  \item{\code{file_sizes_not_included}}{}
+  \item{\code{ab_not_included}}{}
+  \item{\code{labels}}{}
+  \item{\code{pairs_to_keep}}{}
+  \item{\code{cc}}{}
+}
 }
 \description{
 Description goes here.
