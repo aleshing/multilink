@@ -19,7 +19,9 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
                      int L, int num_fp, int num_rp, int num_field,
                      const arma::mat& rp_to_fp, const arma::vec& level_cum,
                      int no_dups, const arma::vec& valid_fp, int cc,
-                     arma::umat Z_members, arma::vec clust_sizes_collapsed){
+                     arma::umat Z_members, arma::vec clust_sizes_collapsed,
+                     int indexing_used, int single_likelihood,
+                     const arma::vec& single_nus, const arma::vec& single_ab){
     for(int i = 1; i < n_iter; i++){
         //// Every 10 iterations check to see if the user has interrupted the
         //// sampler
@@ -39,9 +41,11 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
             Z_curr.elem(record_pairs.col(1) - 1);
         arma::vec coref_vec = arma::conv_to<arma::vec>::from(coref_vec_u);
 
-        List phi = sample_phi_rcpp(coref_vec, obs_mat, ab, mus, nus, L, num_fp,
-                                   num_rp, num_field, rp_to_fp, level_cum,
-                                   valid_fp);
+        List phi = sample_phi_rcpp(coref_vec, obs_mat, ab, mus, nus, L,
+                                   num_fp, num_rp, num_field, rp_to_fp,
+                                   level_cum, valid_fp, single_likelihood,
+                                   single_nus, single_ab);
+
         m_samp.col(i) = as<arma::vec>(phi["m"]);
         u_samp.col(i) = as<arma::vec>(phi["u"]);
 
@@ -55,7 +59,7 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
                                alpha_0, dup_upper_bound, dup_count_prior,
                                n_prior, r, r_1, valid_rp, singleton_ind, rp_ind,
                                file_labels, powers, flat, no_dups, cc,
-                               Z_members, clust_sizes_collapsed);
+                               Z_members, clust_sizes_collapsed, indexing_used);
 
         Z_samp.col(i) = as<arma::vec>(Z["Z"]);
         cont = as<arma::vec>(Z["cont"]);

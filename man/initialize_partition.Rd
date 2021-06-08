@@ -8,13 +8,63 @@ initialize_partition(comparison_list, pairs_to_keep, seed = NA)
 }
 \arguments{
 \item{comparison_list}{the output from a call to
-\code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}}
+\code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.
+Note that in order to correctly specify the initialization, if
+\code{\link{reduce_comparison_data}} is used to the reduce the number of
+record pairs that are candidate matches, then the output of
+\code{\link{reduce_comparison_data}} (not
+\code{\link{create_comparison_data}}) should be used for this argument.}
 
-\item{seed}{}
+\item{pairs_to_keep}{A \code{logical} vector, the same length as
+\code{comparison_list$record_pairs}, indicating which record pairs are
+potential matches in the initialization.}
+
+\item{seed}{The seed to use to generate the initialization.}
 }
 \value{
-
+an \code{integer} vector of arbitrary labels of length
+\code{sum(comparison_list$file_sizes)}, giving an initialization for the
+partition.
 }
 \description{
-Description goes here.
+Generate an initialization for the partition in the case when it is assumed
+there are no duplicates in all files (so that the partition is a matching).
+}
+\details{
+When it is assumed that there are no duplicates in all files, and
+\code{\link{reduce_comparison_data}} is not used to reduce the number of
+potential matches, the Gibbs sampler used for posterior inference may
+experience slow mixing when using an initialization for the partition where
+each record is in its own cluster (the default option for the Gibbs sampler).
+The purpose of this function is to provide an alternative initialization
+scheme.
+
+To use this initialization scheme, the user passes in a \code{logical} vector
+that indicates which record pairs are potential matches according to an
+indexing method (as in \code{\link{reduce_comparison_data}}). Note that this
+indexing is only used to generate the initialization, it is not used for
+inference. The initialization scheme first finds the transitive closure of
+the potential matches, which partitions the records into blocks. Within each
+block of records, the scheme randomly selects a record from each file, and
+these selected records are then placed in the same cluster for the partition
+initialization. All other records are placed in their own clusters.
+}
+\examples{
+# Example with no duplicate dataset
+data(no_dup_data)
+
+# Create the comparison data
+comparison_list <- create_comparison_data(no_dup_data$records,
+ types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+ breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+               c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+ file_sizes = no_dup_data$file_sizes,
+ duplicates = c(0, 0, 0))
+
+# Find initialization for the matching
+# Only keep pairs of records as potential matches in the initialization for
+# which neither gname nor fname disagree at the highest level
+pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
+ (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
+Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 }

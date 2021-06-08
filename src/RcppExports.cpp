@@ -6,9 +6,43 @@
 
 using namespace Rcpp;
 
+// get_posterior_loss_allcpp
+arma::rowvec get_posterior_loss_allcpp(int TT, int r, const arma::mat& partitions, double L_FNM, double L_FM1, double L_FM2);
+RcppExport SEXP _multilink_get_posterior_loss_allcpp(SEXP TTSEXP, SEXP rSEXP, SEXP partitionsSEXP, SEXP L_FNMSEXP, SEXP L_FM1SEXP, SEXP L_FM2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type TT(TTSEXP);
+    Rcpp::traits::input_parameter< int >::type r(rSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type partitions(partitionsSEXP);
+    Rcpp::traits::input_parameter< double >::type L_FNM(L_FNMSEXP);
+    Rcpp::traits::input_parameter< double >::type L_FM1(L_FM1SEXP);
+    Rcpp::traits::input_parameter< double >::type L_FM2(L_FM2SEXP);
+    rcpp_result_gen = Rcpp::wrap(get_posterior_loss_allcpp(TT, r, partitions, L_FNM, L_FM1, L_FM2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_posterior_loss_abstain_cpp
+arma::rowvec get_posterior_loss_abstain_cpp(int TT, int r, const arma::mat& partitions, double L_FNM, double L_FM1, double L_FM2, double L_A, const arma::mat& power);
+RcppExport SEXP _multilink_get_posterior_loss_abstain_cpp(SEXP TTSEXP, SEXP rSEXP, SEXP partitionsSEXP, SEXP L_FNMSEXP, SEXP L_FM1SEXP, SEXP L_FM2SEXP, SEXP L_ASEXP, SEXP powerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type TT(TTSEXP);
+    Rcpp::traits::input_parameter< int >::type r(rSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type partitions(partitionsSEXP);
+    Rcpp::traits::input_parameter< double >::type L_FNM(L_FNMSEXP);
+    Rcpp::traits::input_parameter< double >::type L_FM1(L_FM1SEXP);
+    Rcpp::traits::input_parameter< double >::type L_FM2(L_FM2SEXP);
+    Rcpp::traits::input_parameter< double >::type L_A(L_ASEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type power(powerSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_posterior_loss_abstain_cpp(TT, r, partitions, L_FNM, L_FM1, L_FM2, L_A, power));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gibbs_loop_rcpp
-List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp, arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp, const arma::vec& mus, const arma::vec& nus, const arma::vec& alphas, int alpha_0, const arma::vec& dup_upper_bound, List dup_count_prior, const arma::vec& n_prior, arma::vec cont, arma::mat clust_sizes, int n, const arma::vec& ab, const arma::mat& obs_mat, const arma::umat& record_pairs, int flat, int r, int r_1, const arma::mat& valid_rp, const arma::vec& singleton_ind, const arma::umat& rp_ind, const arma::vec& file_labels, const arma::vec& powers, int L, int num_fp, int num_rp, int num_field, const arma::mat& rp_to_fp, const arma::vec& level_cum, int no_dups, const arma::vec& valid_fp, int cc, arma::umat Z_members, arma::vec clust_sizes_collapsed);
-RcppExport SEXP _multilink_gibbs_loop_rcpp(SEXP n_iterSEXP, SEXP Z_sampSEXP, SEXP clust_sizes_sampSEXP, SEXP cont_sampSEXP, SEXP m_sampSEXP, SEXP u_sampSEXP, SEXP musSEXP, SEXP nusSEXP, SEXP alphasSEXP, SEXP alpha_0SEXP, SEXP dup_upper_boundSEXP, SEXP dup_count_priorSEXP, SEXP n_priorSEXP, SEXP contSEXP, SEXP clust_sizesSEXP, SEXP nSEXP, SEXP abSEXP, SEXP obs_matSEXP, SEXP record_pairsSEXP, SEXP flatSEXP, SEXP rSEXP, SEXP r_1SEXP, SEXP valid_rpSEXP, SEXP singleton_indSEXP, SEXP rp_indSEXP, SEXP file_labelsSEXP, SEXP powersSEXP, SEXP LSEXP, SEXP num_fpSEXP, SEXP num_rpSEXP, SEXP num_fieldSEXP, SEXP rp_to_fpSEXP, SEXP level_cumSEXP, SEXP no_dupsSEXP, SEXP valid_fpSEXP, SEXP ccSEXP, SEXP Z_membersSEXP, SEXP clust_sizes_collapsedSEXP) {
+List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp, arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp, const arma::vec& mus, const arma::vec& nus, const arma::vec& alphas, int alpha_0, const arma::vec& dup_upper_bound, List dup_count_prior, const arma::vec& n_prior, arma::vec cont, arma::mat clust_sizes, int n, const arma::vec& ab, const arma::mat& obs_mat, const arma::umat& record_pairs, int flat, int r, int r_1, const arma::mat& valid_rp, const arma::vec& singleton_ind, const arma::umat& rp_ind, const arma::vec& file_labels, const arma::vec& powers, int L, int num_fp, int num_rp, int num_field, const arma::mat& rp_to_fp, const arma::vec& level_cum, int no_dups, const arma::vec& valid_fp, int cc, arma::umat Z_members, arma::vec clust_sizes_collapsed, int indexing_used, int single_likelihood, const arma::vec& single_nus, const arma::vec& single_ab);
+RcppExport SEXP _multilink_gibbs_loop_rcpp(SEXP n_iterSEXP, SEXP Z_sampSEXP, SEXP clust_sizes_sampSEXP, SEXP cont_sampSEXP, SEXP m_sampSEXP, SEXP u_sampSEXP, SEXP musSEXP, SEXP nusSEXP, SEXP alphasSEXP, SEXP alpha_0SEXP, SEXP dup_upper_boundSEXP, SEXP dup_count_priorSEXP, SEXP n_priorSEXP, SEXP contSEXP, SEXP clust_sizesSEXP, SEXP nSEXP, SEXP abSEXP, SEXP obs_matSEXP, SEXP record_pairsSEXP, SEXP flatSEXP, SEXP rSEXP, SEXP r_1SEXP, SEXP valid_rpSEXP, SEXP singleton_indSEXP, SEXP rp_indSEXP, SEXP file_labelsSEXP, SEXP powersSEXP, SEXP LSEXP, SEXP num_fpSEXP, SEXP num_rpSEXP, SEXP num_fieldSEXP, SEXP rp_to_fpSEXP, SEXP level_cumSEXP, SEXP no_dupsSEXP, SEXP valid_fpSEXP, SEXP ccSEXP, SEXP Z_membersSEXP, SEXP clust_sizes_collapsedSEXP, SEXP indexing_usedSEXP, SEXP single_likelihoodSEXP, SEXP single_nusSEXP, SEXP single_abSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -50,13 +84,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type cc(ccSEXP);
     Rcpp::traits::input_parameter< arma::umat >::type Z_members(Z_membersSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type clust_sizes_collapsed(clust_sizes_collapsedSEXP);
-    rcpp_result_gen = Rcpp::wrap(gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp, m_samp, u_samp, mus, nus, alphas, alpha_0, dup_upper_bound, dup_count_prior, n_prior, cont, clust_sizes, n, ab, obs_mat, record_pairs, flat, r, r_1, valid_rp, singleton_ind, rp_ind, file_labels, powers, L, num_fp, num_rp, num_field, rp_to_fp, level_cum, no_dups, valid_fp, cc, Z_members, clust_sizes_collapsed));
+    Rcpp::traits::input_parameter< int >::type indexing_used(indexing_usedSEXP);
+    Rcpp::traits::input_parameter< int >::type single_likelihood(single_likelihoodSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type single_nus(single_nusSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type single_ab(single_abSEXP);
+    rcpp_result_gen = Rcpp::wrap(gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp, m_samp, u_samp, mus, nus, alphas, alpha_0, dup_upper_bound, dup_count_prior, n_prior, cont, clust_sizes, n, ab, obs_mat, record_pairs, flat, r, r_1, valid_rp, singleton_ind, rp_ind, file_labels, powers, L, num_fp, num_rp, num_field, rp_to_fp, level_cum, no_dups, valid_fp, cc, Z_members, clust_sizes_collapsed, indexing_used, single_likelihood, single_nus, single_ab));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_multilink_gibbs_loop_rcpp", (DL_FUNC) &_multilink_gibbs_loop_rcpp, 38},
+    {"_multilink_get_posterior_loss_allcpp", (DL_FUNC) &_multilink_get_posterior_loss_allcpp, 6},
+    {"_multilink_get_posterior_loss_abstain_cpp", (DL_FUNC) &_multilink_get_posterior_loss_abstain_cpp, 8},
+    {"_multilink_gibbs_loop_rcpp", (DL_FUNC) &_multilink_gibbs_loop_rcpp, 42},
     {NULL, NULL, 0}
 };
 

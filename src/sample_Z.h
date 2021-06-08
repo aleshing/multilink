@@ -14,6 +14,6 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                    const arma::vec& singleton_ind, const arma::umat& rp_ind,
                    const arma::vec& file_labels, const arma::vec& powers,
                    int flat, int no_dups, int cc, arma::umat Z_members,
-                   arma::vec clust_sizes_collapsed);
+                   arma::vec clust_sizes_collapsed, int indexing_used);
 
 #endif //SAMPLE_Z_H

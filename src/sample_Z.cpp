@@ -17,7 +17,7 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                    const arma::vec& singleton_ind, const arma::umat& rp_ind,
                    const arma::vec& file_labels, const arma::vec& powers,
                    int flat, int no_dups, int cc, arma::umat Z_members,
-                   arma::vec clust_sizes_collapsed){
+                   arma::vec clust_sizes_collapsed, int indexing_used){
     for(int j = r_1; j < r; j++){
         // k: the file number of the current record
         int k = file_labels(j);
@@ -73,8 +73,8 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
         }
 
         // Update clust_sizes
-        clust_sizes(k-1, label-1)--;
-        clust_sizes_collapsed(label-1)--;
+        clust_sizes(k - 1, label - 1)--;
+        clust_sizes_collapsed(label - 1)--;
 
         // Give current record an empty label
         Z(j) = -1;
@@ -84,23 +84,79 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             // Valid clusters are just clusters where there are already records,
             // where none of the records are from file k, along with the empty
             // cluster
-            not_empty_clust = clust_sizes_collapsed.t()>0;
-            arma::urowvec ind = clust_sizes.row(k-1)==0 && not_empty_clust;
-            valid_c = arma::conv_to<arma::vec>::from(arma::find(ind.t())+1);
-            int len = valid_c.size();
-            valid_c.resize(len+1);
-            valid_c(len) = -1;
+            not_empty_clust = clust_sizes_collapsed.t() > 0;
+            if(indexing_used){
+                if(cc){
+                    arma::vec possible_c =
+                        arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)))));
+
+                    int empty_counter = 0;
+                    for(int i = 0; i < possible_c.size(); i++){
+                        if(possible_c(i) != -1){
+                            if(clust_sizes(k - 1, possible_c(i) - 1) > 0){
+                                possible_c(i) = -1;
+                                empty_counter++;
+                            }
+                        }
+                    }
+                    valid_c = arma::unique(possible_c);
+                }
+                else{
+                    arma::urowvec ind = clust_sizes.row(k - 1) == 0 && not_empty_clust;
+                    valid_c = arma::conv_to<arma::vec>::from(arma::find(ind.t()) + 1);
+                    arma::vec not_possible_c =
+                        arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)
+                                                                      == 0))));
+
+                    int empty_counter = 0;
+                    int npc_counter = 0;
+                    int npc_size = not_possible_c.size();
+                    for(int i = 0; i < valid_c.size(); i++){
+                        int temp = valid_c(i);
+                        if(npc_counter < npc_size){
+                            int temp_npc = not_possible_c(npc_counter);
+                            while(npc_counter < npc_size & temp_npc <= temp){
+                                if(temp == temp_npc){
+                                    valid_c(i) = -1;
+                                    empty_counter++;
+                                }
+                                npc_counter++;
+                                if(npc_counter < npc_size){
+                                    temp_npc = not_possible_c(npc_counter);
+                                }
+                            }
+                        }
+                    }
+                    if(empty_counter == 0){
+                        int len = valid_c.size();
+                        valid_c.resize(len + 1);
+                        valid_c(len) = -1;
+                    }
+                    else{ valid_c = arma::unique(valid_c); }
+                }
+            }
+            else{
+                arma::urowvec ind = clust_sizes.row(k - 1) == 0 && not_empty_clust;
+                valid_c = arma::conv_to<arma::vec>::from(arma::find(ind.t()) + 1);
+                int len = valid_c.size();
+                valid_c.resize(len + 1);
+                valid_c(len) = -1;
+            }
         }
         else{
-            // Find valid clusters, where -1 from the empty label will correspond
-            // to forming a new cluster. Make sure to sort them!
-            arma::vec possible_c = arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)))));
+            // Find valid clusters, where -1 from the empty label will
+            // correspond to forming a new cluster. Make sure to sort them!
+            arma::vec possible_c =
+                arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)))));
             arma::vec not_possible_c;
-            // Have to do this next line since some of the clusters w/ valid records
-            // may also contain non-valid records if we don't have transitive closures
-            // of all connected components. Make sure to sort them!
+            // Have to do this next line since some of the clusters w/ valid
+            // records may also contain non-valid records if we don't have
+            // transitive closures of all connected components. Make sure to
+            // sort them!
             if(!cc){
-                not_possible_c = arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)==0))));
+                not_possible_c =
+                    arma::sort(arma::unique(Z.elem(arma::find(valid_rp.row(j)
+                                                                  == 0))));
             }
 
             // Can't join clusters that have more than the allowed number of
@@ -110,30 +166,34 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             if(!cc){
                 int npc_counter = 0;
                 int npc_size = not_possible_c.size();
-                for(int i=0; i<possible_c.size(); i++){
+                for(int i = 0; i < possible_c.size(); i++){
                     int temp = possible_c(i);
-                    if(temp!=-1){
-                        if(clust_sizes(k-1, temp-1)>=dup_upper_bound(k-1)){
+                    if(temp != -1){
+                        if(clust_sizes(k - 1, temp - 1) >=
+                           dup_upper_bound(k - 1)){
                             possible_c(i) = -1;
                         }
-                        else if(npc_counter<npc_size){
-                            int temp_npc=not_possible_c(npc_counter);
-                            while(npc_counter<npc_size & temp_npc<=temp){
-                                if(temp==temp_npc){
+                        else if(npc_counter < npc_size){
+                            int temp_npc = not_possible_c(npc_counter);
+                            while(npc_counter < npc_size & temp_npc <= temp){
+                                if(temp == temp_npc){
                                     possible_c(i) = -1;
                                 }
                                 npc_counter++;
-                                if(npc_counter<npc_size){temp_npc=not_possible_c(npc_counter);}
+                                if(npc_counter < npc_size){
+                                    temp_npc = not_possible_c(npc_counter);
+                                }
                             }
                         }
                     }
                 }
             }
             else{
-                for(int i=0; i<possible_c.size(); i++){
+                for(int i = 0; i < possible_c.size(); i++){
                     int temp = possible_c(i);
-                    if(temp!=-1){
-                        if(clust_sizes(k-1, temp-1)>=dup_upper_bound(k-1)){
+                    if(temp != -1){
+                        if(clust_sizes(k - 1, temp - 1) >=
+                           dup_upper_bound(k - 1)){
                             possible_c(i) = -1;
                         }
                     }
@@ -142,31 +202,31 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             valid_c = arma::unique(possible_c);
         }
 
-
         // Calculate cluster assignment probabilities
         arma::vec log_probs = arma::zeros(valid_c.size());
-        for(int c_index=0; c_index<valid_c.size(); c_index++){
+        for(int c_index = 0; c_index < valid_c.size(); c_index++){
             // c_label: the label of the current cluster we're calculating
             // the log_probs for
             int c_label = valid_c(c_index);
             // If c_label isn't an empty cluster
-            if(c_label!=-1){
-
+            if(c_label != -1){
                 // Get the records in c_label
                 arma::uvec records;
                 // Using Z_members slows down inference when we have duplicates
                 if(no_dups){
-                    records = (Z_members.submat(c_label-1, 0, c_label-1,
-                                                clust_sizes_collapsed(c_label-1)-1)-1).t();
+                    records = (Z_members.submat(c_label - 1, 0, c_label - 1,
+                                                clust_sizes_collapsed(c_label
+                                                                          - 1)
+                                                    - 1) - 1).t();
                 }
                 else{
-                    records = arma::find(Z==c_label);
+                    records = arma::find(Z == c_label);
                 }
 
                 // Add the likelihood contribution
                 arma::uvec pairs = rp_ind.col(j);
                 pairs = pairs.elem(records) - 1;
-                if(sum(pairs<0)>0){
+                if(sum(pairs < 0) > 0){
                     Rcout << "Something went wrong, not getting the correct\
                     record pairs" << j << std::endl;
                 }
@@ -175,29 +235,31 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                 if(!flat){
                     // c_k: the number of records from file k in the current
                     // cluster
-                    int c_k = clust_sizes(k-1, c_label-1);
-                    if(c_k>=dup_upper_bound(k-1)){
+                    int c_k = clust_sizes(k - 1, c_label - 1);
+                    if(c_k >= dup_upper_bound(k - 1)){
                         Rcout << "Something went wrong, trying to sample a\
-                        cluster with too many records from file: " << k << std::endl;
+                        cluster with too many records from file: " << k <<
+                            std::endl;
                     }
                     // If there are no other records from file k in c_label
-                    if(c_k==0){
-                        arma::uvec ind = clust_sizes.col(c_label-1)>0;
+                    if(c_k == 0){
+                        arma::uvec ind = clust_sizes.col(c_label - 1) > 0;
                         int ind_without = bin_to_int_rcpp(ind, powers);
-                        ind(k-1) = 1;
+                        ind(k - 1) = 1;
                         int ind_with = bin_to_int_rcpp(ind, powers);
 
                         log_probs(c_index) +=
-                            as<arma::vec>(dup_count_prior[k-1])(0) +
+                            as<arma::vec>(dup_count_prior[k - 1])(0) +
                             std::log(cont(ind_with) + alphas(ind_with)) -
-                            std::log(cont(ind_without) + alphas(ind_without) - 1);
+                            std::log(cont(ind_without) + alphas(ind_without)
+                                         - 1);
                     }
                     // If there are other records from file k in c_label
                     else{
                         log_probs(c_index) +=
                             std::log(c_k + 1) +
-                            as<arma::vec>(dup_count_prior[k-1])(c_k) -
-                            as<arma::vec>(dup_count_prior[k-1])(c_k-1);
+                            as<arma::vec>(dup_count_prior[k - 1])(c_k) -
+                            as<arma::vec>(dup_count_prior[k - 1])(c_k - 1);
                     }
                 }
             }
@@ -205,10 +267,11 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             else{
                 if(!flat){
                     log_probs(c_index) +=
-                        as<arma::vec>(dup_count_prior(k-1))(0) +
+                        as<arma::vec>(dup_count_prior(k - 1))(0) +
                         std::log(n + 1) +
-                        std::log(cont(singleton_ind(k-1)-1) + alphas(singleton_ind(k-1)-1)) -
-                        std::log(n + alpha_0) + n_prior(n) - n_prior(n-1);
+                        std::log(cont(singleton_ind(k - 1) - 1) +
+                        alphas(singleton_ind(k - 1) - 1)) -
+                        std::log(n + alpha_0) + n_prior(n) - n_prior(n - 1);
                 }
             }
         }
@@ -217,15 +280,16 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
         arma::vec probs = exp(log_probs);
 
         int samp = RcppArmadillo::sample(valid_c, 1, TRUE, probs)(0);
-        if(samp==-1){
+        if(samp == -1){
             if(no_dups){
-                arma::uvec empty_clusts = arma::find((not_empty_clust==0))+1;
+                arma::uvec empty_clusts =
+                    arma::find((not_empty_clust == 0)) + 1;
                 samp = empty_clusts(0);
             }
             else{
-                for(int find=1; find<r+1; find++){
-                    arma::uvec ind = Z==find;
-                    if(sum(ind)==0){
+                for(int find = 1; find < r+1; find++){
+                    arma::uvec ind = Z == find;
+                    if(sum(ind) == 0){
                         samp = find;
                         find = r+1;
                     }
@@ -233,19 +297,18 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             }
         }
         Z(j) = samp;
-
         // Update cont, clust_sizes, and n to reflect partition after
         // sampling
         //
         // If record j is the only record in its new cluster from file k,
         // update inclusion patterns
-        if(clust_sizes(k-1, samp-1)==0){
+        if(clust_sizes(k - 1, samp - 1) == 0){
             // Find the inclusion pattern of record j's cluster w/o record j
-            arma::uvec ind = clust_sizes.col(samp-1)>0;
+            arma::uvec ind = clust_sizes.col(samp - 1) > 0;
             // If j isn't in a singleton cluster, decrease the number of
             // clusters with the inclusion pattern of the cluster without
             // record j
-            if(sum(ind)>0){
+            if(sum(ind) > 0){
                 int oldind = bin_to_int_rcpp(ind, powers);
                 cont(oldind)--;
             }
@@ -253,26 +316,27 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
             else{ n++; }
             // Increase the number of clusters with the inclusion pattern of
             // the cluster including record j
-            ind(k-1) = 1;
+            ind(k - 1) = 1;
             int newind = bin_to_int_rcpp(ind, powers);
             cont(newind)++;
         }
         // Update clust_sizes
-        clust_sizes(k-1, samp-1)++;
-        clust_sizes_collapsed(samp-1)++;
-
+        clust_sizes(k - 1, samp - 1)++;
+        clust_sizes_collapsed(samp - 1)++;
         // Using Z_members slows down inference when we have duplicates
         if(no_dups){
             // Update Z_members
-            Z_members.submat(samp-1, clust_sizes_collapsed(samp-1)-1,
-                             samp-1, clust_sizes_collapsed(samp-1)-1) = j+1;
+            Z_members.submat(samp - 1, clust_sizes_collapsed(samp - 1) - 1,
+                             samp - 1, clust_sizes_collapsed(samp - 1) - 1)
+            = j + 1;
         }
     }
 
-    return(List::create(Named("Z")=Z,
-                        Named("cont")=cont,
-                        Named("clust_sizes")=clust_sizes,
-                        Named("n")=n,
-                        Named("Z_members")=Z_members,
-                        Named("clust_sizes_collapsed")=clust_sizes_collapsed));
+    return(List::create(Named("Z") = Z,
+                        Named("cont") = cont,
+                        Named("clust_sizes") = clust_sizes,
+                        Named("n") = n,
+                        Named("Z_members") = Z_members,
+                        Named("clust_sizes_collapsed") =
+                            clust_sizes_collapsed));
 }

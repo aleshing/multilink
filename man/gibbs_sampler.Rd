@@ -6,36 +6,131 @@
 \usage{
 gibbs_sampler(
   comparison_list,
-  partition_prior_list,
-  n_iter = 1000,
-  mus = NA,
-  nus = NA,
-  Z_init = 1:r,
-  seed = 70
+  prior_list,
+  n_iter = 2000,
+  Z_init = 1:sum(comparison_list$file_sizes),
+  seed = 70,
+  single_likelihood = FALSE
 )
 }
 \arguments{
-\item{comparison_list}{the output from a call to
-\code{create_comparison_data} or \code{reduce_comparison_data}}
+\item{comparison_list}{The output from a call to
+\code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.}
 
-\item{partition_prior_list}{the output of a call to
-\code{specify_partition_prior}}
+\item{prior_list}{The output from a call to \code{\link{specify_prior}}.}
 
-\item{n_iter}{The number of iterations of the Gibbs sampler to run}
+\item{n_iter}{The number of iterations of the Gibbs sampler to run.}
 
-\item{seed}{The seed to use while running the Gibbs sampler}
+\item{Z_init}{Initialization of the partition of records, represented as an
+\code{integer} vector of arbitrary labels of length
+\code{sum(comparison_list$file_sizes)}. The default initialization places
+each record in its own cluster. See \code{\link{initialize_partition}} for an
+alternative initialization when there are no duplicates in each file.}
+
+\item{seed}{The seed to use while running the Gibbs sampler.}
+
+\item{single_likelihood}{A \code{logical} indicator of whether to use a
+single likelihood for comparisons for all file pairs, or whether to use a
+separate likelihood for comparisons for each file pair. When
+\code{single_likelihood=TRUE}, a single likelihood is used, and the prior
+hyperparameters for \code{m} and \code{u} from the first file pair are used.
+We do not recommend using a single likelihood in general.}
 }
 \value{
 a list containing:
 \describe{
-  \item{\code{match_samp}}{}
-  \item{\code{non_match_samp}}{}
-  \item{\code{partitions}}{}
-  \item{\code{contingency_tables}}{}
-  \item{\code{cluster_sizes}}{}
-  \item{\code{sampling_time}}{}
+  \item{\code{m}}{Posterior samples of the \code{m} parameters. Each column
+  is one sample.}
+  \item{\code{u}}{Posterior samples of the \code{u} parameters. Each column
+  is one sample.}
+  \item{\code{partitions}}{Posterior samples of the partition. Each column
+  is one sample. Note that the partition is represented as an \code{integer}
+  vector of arbitrary labels of length
+  \code{sum(comparison_list$file_sizes)}.}
+  \item{\code{contingency_tables}}{Posterior samples of the overlap table.
+  Each column is one sample. This incorporates counts of records determined
+  not to be candidate matches to any other records using
+  \code{\link{reduce_comparison_data}}.}
+  \item{\code{cluster_sizes}}{Posterior samples of the size of each cluster
+  (associated with an arbitrary label from \code{1} to
+  \code{sum(comparison_list$file_sizes)}). Each column is one sample.}
+  \item{\code{sampling_time}}{The time in seconds it took to run the
+  sampler.}
 }
 }
 \description{
-Description goes here.
+Run a Gibbs sampler to explore the posterior distribution of partitions of
+records.
+}
+\details{
+Given the prior specified using \code{\link{specify_prior}}, this function
+runs a Gibbs sampler to explore the posterior distribution of partitions of
+records, conditional on the comparison data created using
+\code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.
+}
+\examples{
+# Example with no duplicate dataset
+data(no_dup_data)
+
+# Create the comparison data
+comparison_list <- create_comparison_data(no_dup_data$records,
+ types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+ breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+               c(0, 0.25, 0.5),  c(0, 0.25, 0.5),  NA, NA),
+ file_sizes = no_dup_data$file_sizes,
+ duplicates = c(0, 0, 0))
+
+# Specify the prior
+prior_list <- specify_prior(comparison_list, mus = NA, nus = NA, flat = 0,
+ alphas = rep(1, 7), dup_upper_bound = c(1, 1, 1),
+ dup_count_prior_family = NA, dup_count_prior_pars = NA,
+ n_prior_family = "uniform", n_prior_pars = NA)
+
+# Find initialization for the matching
+# The following line corresponds to only keeping pairs of records as
+# potential matches in the initialization for which neither gname nor fname
+# disagree at the highest level
+pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
+ (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
+Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
+
+# Run the Gibbs sampler
+# Takes around 2 and a half minutes
+\dontrun{
+results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
+ Z_init = Z_init, seed = 42)
+}
+
+# Example with duplicate dataset
+data(dup_data)
+
+# Create the comparison data
+comparison_list <- create_comparison_data(dup_data$records,
+types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+ breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+               c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+ file_sizes = dup_data$file_sizes,
+ duplicates = c(1, 1, 1))
+
+# Reduce the comparison data
+# The following line corresponds to only keeping pairs of records for which
+# neither gname nor fname disagree at the highest level
+pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
+ (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
+reduced_comparison_list <- reduce_comparison_data(comparison_list,
+ pairs_to_keep, cc = 1)
+
+# Specify the prior
+prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
+ flat = 0, alphas = rep(1, 7), dup_upper_bound = c(10, 10, 10),
+ dup_count_prior_family = c("Poisson", "Poisson", "Poisson"),
+ dup_count_prior_pars = list(c(1), c(1), c(1)),
+ n_prior_family = "uniform", n_prior_pars = NA)
+
+# Run the Gibbs sampler
+# Takes around 10 seconds
+\dontrun{
+results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
+ seed = 42)
+}
 }

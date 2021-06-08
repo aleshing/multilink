@@ -1,36 +1,141 @@
 #' Gibbs Sampler for Posterior Inference
 #'
-#' Description goes here.
+#' Run a Gibbs sampler to explore the posterior distribution of partitions of
+#' records.
 #'
-#' @param comparison_list the output from a call to
-#' \code{create_comparison_data} or \code{reduce_comparison_data}
-#' @param partition_prior_list the output of a call to
-#' \code{specify_partition_prior}
-#' @param n_iter The number of iterations of the Gibbs sampler to run
-#' @param mus,nus
-#' @param Z_init
-#' @param seed The seed to use while running the Gibbs sampler
+#' Given the prior specified using \code{\link{specify_prior}}, this function
+#' runs a Gibbs sampler to explore the posterior distribution of partitions of
+#' records, conditional on the comparison data created using
+#' \code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.
+#'
+#' @param comparison_list The output from a call to
+#' \code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.
+#' @param prior_list The output from a call to \code{\link{specify_prior}}.
+#' @param n_iter The number of iterations of the Gibbs sampler to run.
+#' @param Z_init Initialization of the partition of records, represented as an
+#' \code{integer} vector of arbitrary labels of length
+#' \code{sum(comparison_list$file_sizes)}. The default initialization places
+#' each record in its own cluster. See \code{\link{initialize_partition}} for an
+#' alternative initialization when there are no duplicates in each file.
+#' @param seed The seed to use while running the Gibbs sampler.
+#' @param single_likelihood A \code{logical} indicator of whether to use a
+#' single likelihood for comparisons for all file pairs, or whether to use a
+#' separate likelihood for comparisons for each file pair. When
+#' \code{single_likelihood=TRUE}, a single likelihood is used, and the prior
+#' hyperparameters for \code{m} and \code{u} from the first file pair are used.
+#' We do not recommend using a single likelihood in general.
 #'
 #' @return a list containing:
 #' \describe{
-#'   \item{\code{match_samp}}{}
-#'   \item{\code{non_match_samp}}{}
-#'   \item{\code{partitions}}{}
-#'   \item{\code{contingency_tables}}{}
-#'   \item{\code{cluster_sizes}}{}
-#'   \item{\code{sampling_time}}{}
+#'   \item{\code{m}}{Posterior samples of the \code{m} parameters. Each column
+#'   is one sample.}
+#'   \item{\code{u}}{Posterior samples of the \code{u} parameters. Each column
+#'   is one sample.}
+#'   \item{\code{partitions}}{Posterior samples of the partition. Each column
+#'   is one sample. Note that the partition is represented as an \code{integer}
+#'   vector of arbitrary labels of length
+#'   \code{sum(comparison_list$file_sizes)}.}
+#'   \item{\code{contingency_tables}}{Posterior samples of the overlap table.
+#'   Each column is one sample. This incorporates counts of records determined
+#'   not to be candidate matches to any other records using
+#'   \code{\link{reduce_comparison_data}}.}
+#'   \item{\code{cluster_sizes}}{Posterior samples of the size of each cluster
+#'   (associated with an arbitrary label from \code{1} to
+#'   \code{sum(comparison_list$file_sizes)}). Each column is one sample.}
+#'   \item{\code{sampling_time}}{The time in seconds it took to run the
+#'   sampler.}
 #' }
 #' @export
 #'
 #' @examples
-gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
-                          mus = NA, nus = NA, Z_init = 1:r, seed = 70){
+#' # Example with no duplicate dataset
+#' data(no_dup_data)
+#'
+#' # Create the comparison data
+#' comparison_list <- create_comparison_data(no_dup_data$records,
+#'  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+#'  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+#'                c(0, 0.25, 0.5),  c(0, 0.25, 0.5),  NA, NA),
+#'  file_sizes = no_dup_data$file_sizes,
+#'  duplicates = c(0, 0, 0))
+#'
+#' # Specify the prior
+#' prior_list <- specify_prior(comparison_list, mus = NA, nus = NA, flat = 0,
+#'  alphas = rep(1, 7), dup_upper_bound = c(1, 1, 1),
+#'  dup_count_prior_family = NA, dup_count_prior_pars = NA,
+#'  n_prior_family = "uniform", n_prior_pars = NA)
+#'
+#' # Find initialization for the matching
+#' # The following line corresponds to only keeping pairs of records as
+#' # potential matches in the initialization for which neither gname nor fname
+#' # disagree at the highest level
+#' pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
+#'  (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
+#' Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
+#'
+#' # Run the Gibbs sampler
+#' # Takes around 2 and a half minutes
+#' \dontrun{
+#' results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
+#'  Z_init = Z_init, seed = 42)
+#' }
+#'
+#' # Example with duplicate dataset
+#' data(dup_data)
+#'
+#' # Create the comparison data
+#' comparison_list <- create_comparison_data(dup_data$records,
+#' types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+#'  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+#'                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+#'  file_sizes = dup_data$file_sizes,
+#'  duplicates = c(1, 1, 1))
+#'
+#' # Reduce the comparison data
+#' # The following line corresponds to only keeping pairs of records for which
+#' # neither gname nor fname disagree at the highest level
+#' pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
+#'  (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
+#' reduced_comparison_list <- reduce_comparison_data(comparison_list,
+#'  pairs_to_keep, cc = 1)
+#'
+#' # Specify the prior
+#' prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
+#'  flat = 0, alphas = rep(1, 7), dup_upper_bound = c(10, 10, 10),
+#'  dup_count_prior_family = c("Poisson", "Poisson", "Poisson"),
+#'  dup_count_prior_pars = list(c(1), c(1), c(1)),
+#'  n_prior_family = "uniform", n_prior_pars = NA)
+#'
+#' # Run the Gibbs sampler
+#' # Takes around 10 seconds
+#' \dontrun{
+#' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
+#'  seed = 42)
+#' }
+gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
+                          Z_init = 1:sum(comparison_list$file_sizes),
+                          seed = 70, single_likelihood = FALSE){
+    # Input checks
+    if(length(Z_init) != sum(comparison_list$file_sizes)){
+        stop("'length(Z_init)' and 'sum(comparison_list$file_sizes)' must be the
+             same")
+    }
+    if(sum(comparison_list$ab_not_included) > 0 &
+       sum(prior_list$nus - prior_list$nus_specified > 0) == 0){
+        stop("Check to see if comparison_list is the same as comparison_list
+                used in specify_prior.")
+    }
+    if(sum(comparison_list$ab_not_included) == 0 &
+       sum(prior_list$nus - prior_list$nus_specified > 0) > 0){
+        stop("Check to see if comparison_list is the same as comparison_list
+                used in specify_prior.")
+    }
 
     # Progress
     print("Processing inputs")
 
     # Dump the contents of comparison_list
-    # Converted to a matrix for Rcpp
+    # Converted record_pairs to a matrix for Rcpp
     record_pairs <- as.matrix(comparison_list$record_pairs)
     comparisons <- comparison_list$comparisons
     K <- comparison_list$K
@@ -38,20 +143,13 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
     duplicates <- comparison_list$duplicates
     field_levels <- comparison_list$field_levels
     file_labels <- comparison_list$file_labels
+    fp_matrix <- comparison_list$fp_matrix
     rp_to_fp <- comparison_list$rp_to_fp
     ab <- comparison_list$ab
     file_sizes_not_included <- comparison_list$file_sizes_not_included
     ab_not_included <- comparison_list$ab_not_included
     cc <- comparison_list$cc
 
-    # fp_matrix <- create_fp_matrix(K)
-    temp_fp <- expand.grid(1:K, 1:K)[2:1]
-    temp_fp <- temp_fp[temp_fp[, 1] <= temp_fp[, 2], ]
-    fp_matrix <- matrix(0, nrow = K, ncol = K)
-    for(i in 1:nrow(temp_fp)){
-        fp_matrix[temp_fp[i, 1], temp_fp[i, 2]] <- i
-        fp_matrix[temp_fp[i, 2], temp_fp[i, 1]] <- i
-    }
 
     # A hack to overcome how I initialize the partition without initializing the
     # model parameters
@@ -61,7 +159,7 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
     r <- sum(file_sizes)
 
     # Z_samp: a matrix of size r x n_iter, where Z_samp[, i] is the partition at
-    # iteration i, using an arbitrary labelling (where the labels take values in
+    # iteration i, using an arbitrary labeling (where the labels take values in
     # 1:r)
     Z_samp <- matrix(NA, nrow = r, ncol = n_iter)
     Z_samp[, 1] <- Z_init
@@ -77,7 +175,8 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
         }
     }
 
-    # Generate powers for converting binary vectors to integers
+    # powers: Given a binary vector representing the index of a cell in a 2 ^ K
+    # contingency table, powers is used to to convert the index to an integer
     powers <- rev(2 ^ (0:(K - 1)))
 
     # cont: a vector of length 2^K representing the overlap table derived from
@@ -138,7 +237,7 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
 
     # cont_samp: a matrix of size 2^K x n_iter, where cont_samp[, i] is the
     # overlap table derived from the partition at iteration i. Note that the
-    # labelling of the rows is the same labelling as for cont
+    # labeling of the rows is the same labeling as for cont
     cont_samp <- matrix(NA, nrow = 2^K, ncol = n_iter)
     cont_samp[, 1] <- cont
 
@@ -188,13 +287,6 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
     valid_rp <- rp_ind > 0
     for(i in 1:r){ valid_rp[i, i] <- TRUE}
 
-    # If no values are given for mus or nus, use default flat prior
-    if(is.na(mus)){ mus <- rep(1, num_fp * L) }
-    if(is.na(nus)){ nus <- rep(1, num_fp * L) }
-
-    #### Add in prior non-coreferent counts using ab_full
-    nus <- nus + ab_not_included
-
     # m_samp: the samples for the match model probabilities, where each column
     # is the sample from an iteration, structured the same way as mus/nus
     # u_samp: defined similarly to m_samp, but for non-match model probabilities
@@ -213,20 +305,40 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
     r_1 <- 0
     if(duplicates[1] == 0){ r_1 <- file_sizes[1] }
 
-    # Dump the contents of partition_prior_list
-    flat <- partition_prior_list$flat
-    no_dups  <- partition_prior_list$no_dups
-    alphas <- partition_prior_list$alphas
-    alpha_0 <- partition_prior_list$alpha_0
-    dup_upper_bound <- partition_prior_list$dup_upper_bound
-    log_dup_count_prior <- partition_prior_list$log_dup_count_prior
-    log_n_prior <- partition_prior_list$log_n_prior
+    # Dump the contents of prior_list
+    flat <- prior_list$flat
+    mus <- prior_list$mus
+    nus <- prior_list$nus
+    nus_specified <- prior_list$nus_specified
+    no_dups  <- prior_list$no_dups
+    alphas <- prior_list$alphas
+    alpha_0 <- prior_list$alpha_0
+    dup_upper_bound <- prior_list$dup_upper_bound
+    log_dup_count_prior <- prior_list$log_dup_count_prior
+    log_n_prior <- prior_list$log_n_prior
+
+    # Determine whether indexing was used
+    indexing_used <- 0
+    if(sum(ab_not_included) > 0){
+        indexing_used <- 1
+    }
+
+    # Calculate relevant summaries if only a single likelihood is used
+    single_nus <- rep(0, L)
+    single_ab <- rep(0, L)
+    if(single_likelihood){
+        single_nus <- nus_specified[1:L]
+        for(f in 1:num_fp){
+            single_nus <- single_nus +
+                ab_not_included[((f - 1) * L + 1):(f * L)]
+            single_ab <- single_ab + ab[((f - 1) * L + 1):(f * L)]
+        }
+    }
 
     set.seed(seed)
 
     # Progress
     print("Beginning sampling")
-
     # Keep track of time
     start <- Sys.time()
 
@@ -238,22 +350,35 @@ gibbs_sampler <- function(comparison_list, partition_prior_list, n_iter = 1000,
                                     valid_rp, singleton_ind, rp_ind,
                                     file_labels, powers, L, num_fp, num_rp,
                                     FF, rp_to_fp, level_cum, no_dups, valid_fp,
-                                    cc, Z_members, clust_sizes_collapsed)
+                                    cc, Z_members, clust_sizes_collapsed,
+                                    indexing_used, single_likelihood,
+                                    single_nus, single_ab)
 
     # Keep track of time
     end <- Sys.time()
-    sampling_time <- as.numeric(end-start, units="secs")
-
+    sampling_time <- as.numeric(end-start, units = "secs")
     # Progress
     print(paste0("Finished sampling in ", sampling_time, " seconds"))
 
     # Return the posterior samples and the derived contingency tables and
     # cluster sizes, removing the first column
-    return(list(match_samp=gibbs_output$m_samp[, 2:n_iter],
-                non_match_samp=gibbs_output$u_samp[, 2:n_iter],
-                partitions=gibbs_output$Z_samp[, 2:n_iter],
-                contingency_tables=gibbs_output$cont_samp[, 2:n_iter],
-                cluster_sizes=gibbs_output$clust_sizes_samp[, 2:n_iter],
-                sampling_time=sampling_time))
+    contingency_tables <- gibbs_output$cont_samp[, 2:n_iter]
+    if(!single_likelihood){
+        m <- gibbs_output$m_samp[, 2:n_iter]
+        u <- gibbs_output$u_samp[, 2:n_iter]
+        rownames(m) <- names(ab)
+        rownames(u) <- names(ab)
+    }
+    else{
+        m <- gibbs_output$m_samp[1:ncol(comparisons), 2:n_iter]
+        u <- gibbs_output$u_samp[1:ncol(comparisons), 2:n_iter]
+        rownames(m) <- colnames(comparisons)
+        rownames(u) <- colnames(comparisons)
+    }
+    rownames(contingency_tables) <- names(alphas)
+    return(list(m = m, u = u, partitions = gibbs_output$Z_samp[, 2:n_iter],
+                contingency_tables = contingency_tables,
+                cluster_sizes = gibbs_output$clust_sizes_samp[, 2:n_iter],
+                sampling_time = sampling_time))
 
 }

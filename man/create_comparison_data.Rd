@@ -4,21 +4,21 @@
 \alias{create_comparison_data}
 \title{Create Comparison Data}
 \usage{
-create_comparison_data(records, types, breaks, K, file_sizes, duplicates)
+create_comparison_data(records, types, breaks, file_sizes, duplicates)
 }
 \arguments{
-\item{records}{The records to be linked, of class \code{data.frame}.
-It's assumed that each column of \code{records} is a field to be compared,
-and that if there are multiple files (i.e. \code{K}>1), \code{records} is
-obtained by stacking the files on top of each other so that
-\code{records[1:file_sizes[1], ]} contains the records for file \code{1},
+\item{records}{A \code{data.frame} containing the records to be linked, where
+each column of \code{records} is a field to be compared. If there are
+multiple files, \code{records} should be obtained by stacking the files on
+top of each other so that \code{records[1:file_sizes[1], ]} contains the
+records for file \code{1},
 \code{records[(file_sizes[1] + 1):(file_sizes[1] + file_sizes[2]), ]}
 contains the records for file \code{2}, and so on. Missing values should be
 coded as \code{NA}.}
 
 \item{types}{A \code{character} vector, indicating the comparison to be used
-for each column of \code{records}. The options are: \code{"bi"} for
-binary comparisons, \code{"nu"} for numeric comparisons
+for each field (i.e. each column of \code{records}). The options are:
+\code{"bi"} for binary comparisons, \code{"nu"} for numeric comparisons
 (absolute difference), and \code{"lv"} for string comparisons (normalized
 Levenshtein distance). We assume that fields using options \code{"bi"} and
 \code{"lv"} are  of class \code{character}, and fields using the \code{"nu"}
@@ -26,38 +26,125 @@ option are of class \code{numeric}.}
 
 \item{breaks}{A \code{list}, the same length as \code{types}, indicating the
 break points used to compute disagreement levels for each fields'
-comparisons. If \code{types[f]=="bi"}, \code{breaks[[f]]} is ignored.}
+comparisons. If \code{types[f]="bi"}, \code{breaks[[f]]} is ignored (and thus
+can be set to \code{NA}). See Details for more information on specifying this
+argument.}
 
-\item{K}{The number of files, assumed to be of class \code{numeric}.}
+\item{file_sizes}{A \code{numeric} vector indicating the size of each file.}
 
-\item{file_sizes}{A \code{numeric} vector of length \code{K}, indicating the
-size of each file.}
-
-\item{duplicates}{A \code{numeric} vector of length \code{K}, indicating
-which files have duplicates. \code{duplicates[k]} should be \code{1} if file
-\code{k} has duplicates, and \code{duplicates[k]} should be \code{0} if file
-\code{k} has no duplicates. If any files do not have duplicates, we strongly
-recommend that the largest such file is organized to be the first file.}
+\item{duplicates}{A \code{numeric} vector indicating which files are assumed
+to have duplicates. \code{duplicates[k]} should be \code{1} if file \code{k}
+has duplicates, and \code{duplicates[k]} should be \code{0} if file \code{k}
+has no duplicates. If any files do not have duplicates, we strongly recommend
+that the largest such file is organized to be the first file.}
 }
 \value{
 a list containing:
 \describe{
-  \item{\code{record_pairs}}{}
-  \item{\code{comparisons}}{}
-  \item{\code{K}}{}
-  \item{\code{file_sizes}}{}
-  \item{\code{duplicates}}{}
-  \item{\code{field_levels}}{}
-  \item{\code{file_labels}}{}
-  \item{\code{rp_to_fp}}{}
-  \item{\code{ab}}{}
-  \item{\code{file_sizes_not_included}}{}
-  \item{\code{ab_not_included}}{}
-  \item{\code{labels}}{}
-  \item{\code{pairs_to_keep}}{}
-  \item{\code{cc}}{}
+  \item{\code{record_pairs}}{A \code{data.frame}, where each row
+  contains the pair of records being compared in the corresponding row of
+  \code{comparisons}. The rows are sorted in ascending order according to the
+  first column, with ties broken according to the second column in ascending
+  order. For any given row, the first column is less than the second column,
+  i.e. \code{record_pairs[i, 1] < record_pairs[i, 2]} for each row \code{i}.}
+  \item{\code{comparisons}}{A \code{logical} matrix, where each row contains
+  the comparisons for the record pair in the corresponding row of
+  \code{record_pairs}. Comparisons are in the same order as the columns of
+  \code{records}, and are represented by \code{L + 1} columns of
+  \code{TRUE/FALSE} indicators, where \code{L + 1} is the number of
+  disagreement levels for the field based on \code{breaks}.}
+  \item{\code{K}}{The number of files, assumed to be of class
+  \code{numeric}.}
+  \item{\code{file_sizes}}{A \code{numeric} vector of length \code{K},
+  indicating the size of each file.}
+  \item{\code{duplicates}}{A \code{numeric} vector of length \code{K},
+  indicating which files are assumed to have duplicates. \code{duplicates[k]}
+  should be \code{1} if file \code{k} has duplicates, and
+  \code{duplicates[k]} should be \code{0} if file \code{k} has no duplicates.
+  If any files do not have duplicates, we strongly recommend that the largest
+  such file is organized to be the first file.}
+  \item{\code{field_levels}}{A \code{numeric} vector indicating the number of
+  disagreement levels for each field.}
+  \item{\code{file_labels}}{An \code{integer} vector of length
+  \code{sum(file_sizes)}, where \code{file_labels[i]} indicates which file
+  record \code{i} is in.}
+  \item{\code{fp_matrix}}{An \code{integer} matrix, where
+  \code{fp_matrix[k1, k2]} is a label for the file pair \code{(k1, k2)}. Note
+  that \code{fp_matrix[k1, k2] = fp_matrix[k2, k1]}.}
+  \item{\code{rp_to_fp}}{A \code{logical} matrix that indicates which record
+  pairs belong to which file pairs. \code{rp_to_fp[fp, rp]} is \code{TRUE} if
+  the records  \code{record_pairs[rp, ]} belong to the file pair \code{fp},
+  and is FALSE otherwise. Note that \code{fp} is given by the labelling in
+  \code{fp_matrix}.}
+  \item{\code{ab}}{An \code{integer} vector, of length
+  \code{ncol(comparisons) * K * (K + 1) / 2} that indicates how many record
+  pairs there are with a given disagreement level for a given field, for each
+  file pair.}
+  \item{\code{file_sizes_not_included}}{A \code{numeric} vector of \code{0}s.
+  This element is non-zero when \code{\link{reduce_comparison_data}} is
+  used.}
+  \item{\code{ab_not_included}}{A \code{numeric} vector of \code{0}s. This
+  element is non-zero when \code{\link{reduce_comparison_data}} is used.}
+  \item{\code{labels}}{\code{NA}. This element is not \code{NA} when
+  \code{\link{reduce_comparison_data}} is used.}
+  \item{\code{pairs_to_keep}}{\code{NA}. This element is not \code{NA} when
+  \code{\link{reduce_comparison_data}} is used.}
+  \item{\code{cc}}{\code{0}. This element is non-zero when
+  \code{\link{reduce_comparison_data}} is used.}
 }
 }
 \description{
-Description goes here.
+Create comparison data for all pairs of records, except for those records in
+files which are assumed to have no duplicates.
+}
+\details{
+The purpose of this function is to construct comparison vectors for each pair
+of records. In order to construct these vectors, one needs to specify the
+\code{types} and \code{breaks} arguments. The \code{types} argument specifies
+how each field should be compared, and the \code{breaks} argument specifies
+how to discretize these comparisons.
+
+Currently, the \code{types} argument supports three types of field
+comparisons: binary, absolute difference, and the normalized Levenshtein
+distance. Please contact the package maintainer if you need a new type of
+comparison to be supported.
+
+The \code{breaks} argument should be a \code{list}, with with one element for
+each field. If a field is being compared with a binary comparison, i.e.
+\code{types[f]="bi"}, then the corresponding element of \code{breaks} should
+be \code{NA}, i.e. \code{breaks[[f]]=NA}. If a field is being compared with a
+numeric or string comparison, then the corresponding element of \code{breaks}
+should be a vector of cut points used to discretize the comparisons. To give
+more detail, suppose you pass in cut points
+\code{breaks[[f]]=c(cut_1, ...,cut_L)}. These cut points
+discretize the range of the comparisons into \code{L+1} intervals:
+\eqn{I_0=(-\infty, cut_1], I_1=(cut_1, cut_2], ..., I_L=(cut_L, \infty]}. The
+raw comparisons, which lie in \eqn{[0,\infty)} for numeric comparisons and
+\eqn{[0,1]} for  string comparisons, are then replaced with indicators of
+which interval the comparisons lie in. The interval \eqn{I_0} corresponds to
+the lowest level of disagreement for a comparison, while the interval
+\eqn{I_L} corresponds to the highest level of disagreement for a comparison.
+}
+\examples{
+## Example with no duplicate dataset
+data(no_dup_data)
+
+# Create the comparison data
+comparison_list <- create_comparison_data(no_dup_data$records,
+ types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+ breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+               c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+ file_sizes = no_dup_data$file_sizes,
+ duplicates = c(0, 0, 0))
+
+## Example with duplicate dataset
+data(dup_data)
+
+# Create the comparison data
+comparison_list <- create_comparison_data(dup_data$records,
+ types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+ breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
+               c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+ file_sizes = dup_data$file_sizes,
+ duplicates = c(1, 1, 1))
 }
