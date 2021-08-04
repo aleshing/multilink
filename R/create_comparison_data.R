@@ -198,6 +198,18 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
                             numeric comparison is going to be used"))
             }
         }
+        else if (types[f] == "longlat"){
+            if(!is.character(records[, f])){
+                stop(paste0("Column ",  f, " of 'records' must be of type
+                            character if a comparison between longitudes and
+                            latitudes is going to be used"))
+            }
+            if(sum(is.na(breaks[[f]])) > 0){
+                stop(paste0("Element ",  f, " of 'breaks' must be specified if a
+                            comparison between longitudes and  latitudes is
+                            going to be used"))
+            }
+        }
         else{
             stop("Elements of 'types' must be one of 'bi', 'lv', or 'nu'")
         }
@@ -260,6 +272,21 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
                                                           records[rps2, f])
             # as.numeric(utils::adist(records[, f], records[, f]))/
             #     pmax(nchar(records[, f])[rps1], nchar(records[, f])[rps2])
+            temp_breaks <- unique(c(-Inf, breaks[[f]], Inf))
+            comparisons[, f] <- cut(raw_comp, breaks = temp_breaks,
+                                    labels = 1:(length(temp_breaks) - 1))
+            field_levels[f] <- length(temp_breaks) - 1
+        }
+        if(types[f] == "longlat"){
+            split_records <-
+                as.data.frame(stringr::str_split_fixed(records[, f],
+                                                       pattern = ",", n = 2),
+                              stringsAsFactors = FALSE)
+            split_records$V1 <- as.numeric(split_records$V1)
+            split_records$V2 <- as.numeric(split_records$V2)
+            # Convert distance from meters to miles
+            raw_comp <- geosphere::distGeo(split_records[rps1, ],
+                                           split_records[rps2, ]) * 0.000621371
             temp_breaks <- unique(c(-Inf, breaks[[f]], Inf))
             comparisons[, f] <- cut(raw_comp, breaks = temp_breaks,
                                     labels = 1:(length(temp_breaks) - 1))

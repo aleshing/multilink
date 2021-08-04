@@ -328,7 +328,12 @@ specify_prior <- function(comparison_list, mus = NA, nus = NA, flat = 0,
         X <- matrix(as.numeric(intToBits(0:(2 ^ comparison_list$K - 1))),
                     nrow = 2 ^ comparison_list$K,
                     byrow = TRUE)[, comparison_list$K:1]
-        names(alphas) <- apply(X, 1, paste0, collapse = "")
+        if(K == 1){
+            names(alphas) <- c("0", "1")
+        }
+        else{
+            names(alphas) <- apply(X, 1, paste0, collapse = "")
+        }
 
 
         # If the maximum number of duplicates for each file were set to NA,
