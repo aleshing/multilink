@@ -29,11 +29,11 @@ install.packages("devtools")
 devtools::install_github("aleshing/multilink")
 ```
 
-## Example
+<!-- ## Example -->
 
 
-```{r example}
-library(multilink)
-## basic example code
-```
+<!-- ```{r example} -->
+<!-- library(multilink) -->
+<!-- ## basic example code -->
+<!-- ``` -->
 

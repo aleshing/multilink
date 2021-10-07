@@ -4,7 +4,6 @@
 # multilink
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 multilink implements methodology for multifile record linkage and
@@ -19,9 +18,8 @@ install.packages("devtools")
 devtools::install_github("aleshing/multilink")
 ```
 
-## Example
-
-``` r
-library(multilink)
-## basic example code
-```
+<!-- ## Example -->
+<!-- ```{r example} -->
+<!-- library(multilink) -->
+<!-- ## basic example code -->
+<!-- ``` -->
