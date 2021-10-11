@@ -6,8 +6,11 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-multilink implements methodology for multifile record linkage and
-duplicate detection.
+multilink is an R package which implements methodology for multifile
+record linkage and duplicate detection presented in the manuscript
+“Multifile Partitioning for Record Linkage and Duplicate Detection” by
+Serge Aleshin-Guendel and Mauricio Sadinle, available on
+[arXiv](https://arxiv.org/abs/2110.03839v1).
 
 ## Installation
 
