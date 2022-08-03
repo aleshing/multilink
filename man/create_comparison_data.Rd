@@ -19,10 +19,16 @@ coded as \code{NA}.}
 \item{types}{A \code{character} vector, indicating the comparison to be used
 for each field (i.e. each column of \code{records}). The options are:
 \code{"bi"} for binary comparisons, \code{"nu"} for numeric comparisons
-(absolute difference), and \code{"lv"} for string comparisons (normalized
-Levenshtein distance). We assume that fields using options \code{"bi"} and
-\code{"lv"} are  of class \code{character}, and fields using the \code{"nu"}
-option are of class \code{numeric}.}
+(absolute difference), \code{"lv"} for string comparisons (normalized
+Levenshtein distance), \code{"lv_sep"} for string comparisons (normalized
+Levenshtein distance) where each string may contain multiple spellings
+separated by the "|" character. We assume that fields using options
+ \code{"bi"}, \code{"lv"}, and \code{"lv_sep"} are  of class
+ \code{character}, and fields using the \code{"nu"} option are of class
+ \code{numeric}. For fields using the \code{"lv_sep"} option, for each record
+pair the normalized Levenshtein distance is computed between each possible
+spelling, and the minimum normalized Levenshtein distance between spellings
+is then used as the comparison for that record pair.}
 
 \item{breaks}{A \code{list}, the same length as \code{types}, indicating the
 break points used to compute disagreement levels for each fields'

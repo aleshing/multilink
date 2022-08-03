@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // get_posterior_loss_allcpp
 arma::rowvec get_posterior_loss_allcpp(int TT, int r, const arma::mat& partitions, double L_FNM, double L_FM1, double L_FM2);
 RcppExport SEXP _multilink_get_posterior_loss_allcpp(SEXP TTSEXP, SEXP rSEXP, SEXP partitionsSEXP, SEXP L_FNMSEXP, SEXP L_FM1SEXP, SEXP L_FM2SEXP) {

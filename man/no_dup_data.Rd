@@ -4,7 +4,8 @@
 \name{no_dup_data}
 \alias{no_dup_data}
 \title{No Duplicate Dataset}
-\format{A list with three elements:
+\format{
+A list with three elements:
 \describe{
   \item{records}{A \code{data.frame} with the records, containing \code{7}
   fields, from all three files, in the format used for input to
@@ -13,7 +14,8 @@
   \item{IDs}{The true partition of the records, represented as an
   \code{integer}  vector of arbitrary labels of length
   \code{sum(file_sizes)}.}
-}}
+}
+}
 \source{
 Extracted from the datasets used in the simulation study of the
 paper. The datasets were generated using code from Peter Christen's group

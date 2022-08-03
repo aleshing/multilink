@@ -41,10 +41,16 @@
 #' @param types A \code{character} vector, indicating the comparison to be used
 #' for each field (i.e. each column of \code{records}). The options are:
 #' \code{"bi"} for binary comparisons, \code{"nu"} for numeric comparisons
-#' (absolute difference), and \code{"lv"} for string comparisons (normalized
-#' Levenshtein distance). We assume that fields using options \code{"bi"} and
-#' \code{"lv"} are  of class \code{character}, and fields using the \code{"nu"}
-#' option are of class \code{numeric}.
+#' (absolute difference), \code{"lv"} for string comparisons (normalized
+#' Levenshtein distance), \code{"lv_sep"} for string comparisons (normalized
+#' Levenshtein distance) where each string may contain multiple spellings
+#' separated by the "|" character. We assume that fields using options
+#'  \code{"bi"}, \code{"lv"}, and \code{"lv_sep"} are  of class
+#'  \code{character}, and fields using the \code{"nu"} option are of class
+#'  \code{numeric}. For fields using the \code{"lv_sep"} option, for each record
+#' pair the normalized Levenshtein distance is computed between each possible
+#' spelling, and the minimum normalized Levenshtein distance between spellings
+#' is then used as the comparison for that record pair.
 #' @param breaks A \code{list}, the same length as \code{types}, indicating the
 #' break points used to compute disagreement levels for each fields'
 #' comparisons. If \code{types[f]="bi"}, \code{breaks[[f]]} is ignored (and thus
@@ -187,6 +193,17 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
                             string comparison is going to be used"))
             }
         }
+        else if (types[f] == "lv_sep"){
+            if(!is.character(records[, f])){
+                stop(paste0("Column ",  f, " of 'records' must be of type
+                            character if a string comparison is going to be
+                            used"))
+            }
+            if(sum(is.na(breaks[[f]])) > 0){
+                stop(paste0("Element ",  f, " of 'breaks' must be specified if a
+                            string comparison is going to be used"))
+            }
+        }
         else if (types[f] == "nu"){
             if(!is.numeric(records[, f])){
                 stop(paste0("Column ",  f, " of 'records' must be of type
@@ -211,7 +228,8 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
             }
         }
         else{
-            stop("Elements of 'types' must be one of 'bi', 'lv', or 'nu'")
+            stop("Elements of 'types' must be one of 'bi', 'lv',  'lv_sep', or
+                 'nu'")
         }
     }
 
@@ -272,6 +290,46 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
                                                           records[rps2, f])
             # as.numeric(utils::adist(records[, f], records[, f]))/
             #     pmax(nchar(records[, f])[rps1], nchar(records[, f])[rps2])
+            temp_breaks <- unique(c(-Inf, breaks[[f]], Inf))
+            comparisons[, f] <- cut(raw_comp, breaks = temp_breaks,
+                                    labels = 1:(length(temp_breaks) - 1))
+            field_levels[f] <- length(temp_breaks) - 1
+        }
+        if(types[f] == "lv_sep"){
+            # Find how many spellings there are of field f in each record
+            num_spellings <- stringr::str_count(records[, f],
+                                                pattern =
+                                                    stringr::fixed("|")) + 1
+            # Find the maximum number of spellings of field f in a record
+            max_spellings <- max(num_spellings)
+            # Split field f into max_spellings columns
+            split_records <-
+                as.data.frame(stringr::str_split_fixed(records[, f],
+                                                       pattern =
+                                                           stringr::fixed("|"),
+                                                       n = max_spellings),
+                              stringsAsFactors = FALSE)
+            split_records <- apply(split_records, 2, trimws)
+
+            # Calculate Levenshtein distance between each spelling
+            raw_comps <- matrix(0, nrow = num_rp,
+                                ncol = choose(max_spellings, 2) + max_spellings)
+            counter <- 0
+            for(i in 1:max_spellings){
+                for(j in i:max_spellings){
+                    counter <- counter + 1
+                    raw_comps[, counter] <- 1 -
+                        RecordLinkage::levenshteinSim(split_records[rps1, i],
+                                                      split_records[rps2, j])
+                }
+            }
+
+            # Take minimum of Levenshtein distances for each record pair
+            raw_comps[is.nan(raw_comps)] <- 1
+            raw_comp <- rep(0, num_rp)
+            for(i in 1:num_rps){
+                raw_comp[i] <- min(raw_comps[i, ])
+            }
             temp_breaks <- unique(c(-Inf, breaks[[f]], Inf))
             comparisons[, f] <- cut(raw_comp, breaks = temp_breaks,
                                     labels = 1:(length(temp_breaks) - 1))
