@@ -17,11 +17,10 @@
 #' the posterior expected loss is minimized. Default is \code{nrow(partitions)},
 #' i.e. no approximation is used. When \code{is.infinite(L_A)}, we recommend
 #' setting this argument to \code{50}, then increasing based on a computational
-#' budget (setting this argument to values around \code{100-200} should be
-#' computationally feasible). When \code{!is.infinite(L_A)}, we recommend
-#' setting this argument to \code{10-12}, then increasing based on a
-#' computational budget (although an increase of \code{1} in this argument can
-#' in the worst case lead to a doubling in computation time).
+#' budget. When \code{!is.infinite(L_A)}, we recommend setting this argument to
+#' \code{10-12}, then increasing based on a computational budget (although an
+#' increase of \code{1} in this argument can in the worst case lead to a
+#' doubling in computation time).
 #'
 #' @return
 #' A vector, the same length of a column of \code{partitions} containing the

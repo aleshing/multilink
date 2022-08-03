@@ -197,6 +197,19 @@
 #'
 #' # Precision of the partial estimate is 0.96
 #' true_matches_A / sum(partial_estimate_links)
+#'
+#' # Relabel the full and partial Bayes estimates
+#' full_estimate_relabel <- relabel_bayes_estimate(reduced_comparison_list,
+#'  full_estimate)
+#'
+#'  partial_estimate_relabel <- relabel_bayes_estimate(reduced_comparison_list,
+#'   partial_estimate)
+#'
+#'  # Add columns to the records corresponding to their full and partial
+#'  # Bayes estimates
+#'  dup_data$records <- cbind(dup_data$records,
+#'   full_estimate_id = full_estimate_relabel$link_id,
+#'   partial_estimate_id = partial_estimate_relabel$link_id)
 #' }
 #'
 #' @docType package
