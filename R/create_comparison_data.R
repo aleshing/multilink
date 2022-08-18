@@ -327,7 +327,7 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
             # Take minimum of Levenshtein distances for each record pair
             raw_comps[is.nan(raw_comps)] <- 1
             raw_comp <- rep(0, num_rp)
-            for(i in 1:num_rps){
+            for(i in 1:num_rp){
                 raw_comp[i] <- min(raw_comps[i, ])
             }
             temp_breaks <- unique(c(-Inf, breaks[[f]], Inf))
