@@ -24,6 +24,22 @@
 #' \code{single_likelihood=TRUE}, a single likelihood is used, and the prior
 #' hyperparameters for \code{m} and \code{u} from the first file pair are used.
 #' We do not recommend using a single likelihood in general.
+#' @param chaperones_info If \code{chaperones_info} is set to \code{NA}, then
+#' Gibbs updates to the partition are used during the Gibbs sampler. Else,
+#' \code{chaperones_info} should be a \code{list} with five elements
+#' controlling Chaperones updates to the partition during the Gibbs sampler:
+#' \code{chap_type}, \code{num_chap_iter}, \code{nonuniform_chap_type},
+#' \code{extra_gibbs}, \code{num_restrict}. \code{chap_type} is \code{0} if
+#' using a uniform Chaperones distribution, and \code{1} if
+#' using a nonuniform Chaperones distribution. \code{num_chap_iter} is the
+#' number of Chaperones updates to the partition that are made during each
+#' iteration of the Gibbs sampler. When using a nonuniform Chaperones
+#' distribution, \code{nonuniform_chap_type} is \code{0} if using the exact
+#' version, or \code{1} if using the partial version. \code{extra_gibbs} is a
+#' \code{logical} indicator of whether a Gibbs update to the partition should be
+#' done after the Chaperones updates, at each iteration of the Gibbs sampler.
+#' \code{num_restrict} is the number of restricted Gibbs steps to take during
+#' each Chaperones update to the partition.
 #'
 #' @return a list containing:
 #' \describe{
@@ -113,8 +129,9 @@
 #'  seed = 42)
 #' }
 gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
-                          Z_init = 1:sum(comparison_list$file_sizes),
-                          seed = 70, single_likelihood = FALSE){
+                               Z_init = 1:sum(comparison_list$file_sizes),
+                               seed = 70, single_likelihood = FALSE,
+                               chaperones_info = NA){
     # Input checks
     if(length(Z_init) != sum(comparison_list$file_sizes)){
         stop("'length(Z_init)' and 'sum(comparison_list$file_sizes)' must be the
@@ -129,6 +146,40 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
        sum(prior_list$nus - prior_list$nus_specified > 0) > 0){
         stop("Check to see if comparison_list is the same as comparison_list
                 used in specify_prior.")
+    }
+    if(sum(is.na(chaperones_info)) > 0){
+        print("Running Gibbs sampler with Gibbs updates to partition.")
+        chap_type <- -1
+        num_chap_iter <- NA
+        nonuniform_chap_type <- 1
+        extra_gibbs <- NA
+        num_restrict <- NA
+    } else{
+        if(sum(comparison_list$ab_not_included) > 0){
+            stop("Chaperones updates to partition are not currently
+                 supported when using indexing.")
+        }
+        chap_type <- chaperones_info$chap_type
+        num_chap_iter <- chaperones_info$num_chap_iter
+        nonuniform_chap_type <- chaperones_info$nonuniform_chap_type
+        extra_gibbs <- chaperones_info$extra_gibbs
+        num_restrict <- chaperones_info$num_restrict
+        if(chap_type == 0){
+            print("Running Gibbs sampler with Chaperones updates to partition,
+                  uniform Chaperones distribution.")
+            nonuniform_chap_type <- 1
+        }
+        else if(chap_type == 1 & nonuniform_chap_type == 0){
+            print("Running Gibbs sampler with Chaperones updates to partition,
+                  nonuniform Chaperones distribution (exact).")
+        }
+        else if(chap_type == 1 & nonuniform_chap_type == 1){
+            print("Running Gibbs sampler with Chaperones updates to partition,
+                  nonuniform Chaperones distribution (partial).")
+        }
+        else {
+            stop("chaperones_info$nonuniform_chap_type should be 0 or 1.")
+        }
     }
 
     # Progress
@@ -214,8 +265,9 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     }
 
 
-    # clust_sizes_collapsed: a vector of size r, where clust_sizes[i] represents
-    # the number of records in the cluster with label i in the current partition
+    # clust_sizes_collapsed: a vector of size r, where
+    # clust_sizes_collapsed[i] represents the number of records in the cluster
+    # with label i in the current partition
     clust_sizes_collapsed <- colSums(clust_sizes)
 
     # singleton_ind: a length K vector, where singleton_ind[k] is the index in
@@ -335,6 +387,77 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
         }
     }
 
+    # Do stuff for chaperones
+    file_size_cum <- c(1, cumsum(file_sizes) + 1)
+    valid_fp_matrix <- matrix(NA, ncol = choose(K, 2) + sum(duplicates), nrow = 2)
+    fp_probs <- rep(NA, choose(K, 2) + sum(duplicates))
+    counter <- 1
+    for(i in 1:K){
+        for(j in i:K){
+            if(i == j){
+                if(duplicates[i]){
+                    valid_fp_matrix[, counter] <- c(i, i)
+                    fp_probs[counter] <- file_sizes[i] * file_sizes[i]
+                    counter <- counter + 1
+                }
+            }
+            else{
+                valid_fp_matrix[, counter] <- c(i, j)
+                fp_probs[counter] <- file_sizes[i] * file_sizes[j]
+                counter <- counter + 1
+            }
+        }
+    }
+    fp_probs <- fp_probs / sum(fp_probs)
+
+    if(nonuniform_chap_type == 0){
+        comparisons_chap <- matrix(NA, nrow = num_rp, ncol = FF)
+        for(i in 1:ncol(comparisons_chap)){
+            comparisons_chap[, i] <- comparisons[, level_cum[i]]
+        }
+    }
+    else if(nonuniform_chap_type == 1){
+        comparisons_chap <- matrix(NA, nrow = num_rp, ncol = FF)
+        for(i in 1:ncol(comparisons_chap)){
+            inds <- level_cum[i]:(level_cum[i+1] - 2)
+            if(length(inds) == 1){
+                comparisons_chap[, i] <- comparisons[, inds]
+            }
+            else{
+                comparisons_chap[, i] <- rowSums(comparisons[, inds]) > 0
+            }
+
+        }
+    }
+
+    comparison_rps <- list()
+    comparison_rps_probs <- c(1 / (FF + 1))
+    counter <- 1
+    for(i in 1:FF){
+        combinations <- combn(FF, i)
+        for(j in 1:ncol(combinations)){
+            cols <- combinations[, j]
+            if(i == 1){
+                temp_comp <- comparisons_chap[, cols]
+            }
+            else{
+                temp_comp <- rowSums(comparisons_chap[, cols])
+            }
+            which_comps <- which(temp_comp == i)
+            if(length(which_comps) > 0){
+                comparison_rps[[counter]] <- which_comps
+                comparison_rps_probs[counter + 1] <-
+                    c((1 / (FF + 1)) * (1 / ncol(combinations)))
+                counter <- counter + 1
+            }
+        }
+    }
+    comparison_rps_probs <- comparison_rps_probs / sum(comparison_rps_probs)
+
+
+
+
+
     set.seed(seed)
 
     # Progress
@@ -343,16 +466,20 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     start <- Sys.time()
 
     gibbs_output <- gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp,
-                                    m_samp, u_samp, mus, nus, alphas, alpha_0,
-                                    dup_upper_bound, log_dup_count_prior,
-                                    log_n_prior, cont, clust_sizes, n, ab,
-                                    comparisons, record_pairs, flat, r, r_1,
-                                    valid_rp, singleton_ind, rp_ind,
-                                    file_labels, powers, L, num_fp, num_rp,
-                                    FF, rp_to_fp, level_cum, no_dups, valid_fp,
-                                    cc, Z_members, clust_sizes_collapsed,
-                                    indexing_used, single_likelihood,
-                                    single_nus, single_ab)
+                                         m_samp, u_samp, mus, nus, alphas, alpha_0,
+                                         dup_upper_bound, log_dup_count_prior,
+                                         log_n_prior, cont, clust_sizes, n, ab,
+                                         comparisons, record_pairs, flat, r, r_1,
+                                         valid_rp, singleton_ind, rp_ind,
+                                         file_labels, powers, L, num_fp, num_rp,
+                                         FF, rp_to_fp, level_cum, no_dups, valid_fp,
+                                         cc, Z_members, clust_sizes_collapsed,
+                                         indexing_used, single_likelihood,
+                                         single_nus, single_ab,
+                                         num_chap_iter, chap_type, file_size_cum,
+                                         valid_fp_matrix, fp_probs,
+                                         comparison_rps, length(comparison_rps), extra_gibbs,
+                                         num_restrict, comparisons_chap, comparison_rps_probs)
 
     # Keep track of time
     end <- Sys.time()

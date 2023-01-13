@@ -46,8 +46,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // gibbs_loop_rcpp
-List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp, arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp, const arma::vec& mus, const arma::vec& nus, const arma::vec& alphas, int alpha_0, const arma::vec& dup_upper_bound, List dup_count_prior, const arma::vec& n_prior, arma::vec cont, arma::mat clust_sizes, int n, const arma::vec& ab, const arma::mat& obs_mat, const arma::umat& record_pairs, int flat, int r, int r_1, const arma::mat& valid_rp, const arma::vec& singleton_ind, const arma::umat& rp_ind, const arma::vec& file_labels, const arma::vec& powers, int L, int num_fp, int num_rp, int num_field, const arma::mat& rp_to_fp, const arma::vec& level_cum, int no_dups, const arma::vec& valid_fp, int cc, arma::umat Z_members, arma::vec clust_sizes_collapsed, int indexing_used, int single_likelihood, const arma::vec& single_nus, const arma::vec& single_ab);
-RcppExport SEXP _multilink_gibbs_loop_rcpp(SEXP n_iterSEXP, SEXP Z_sampSEXP, SEXP clust_sizes_sampSEXP, SEXP cont_sampSEXP, SEXP m_sampSEXP, SEXP u_sampSEXP, SEXP musSEXP, SEXP nusSEXP, SEXP alphasSEXP, SEXP alpha_0SEXP, SEXP dup_upper_boundSEXP, SEXP dup_count_priorSEXP, SEXP n_priorSEXP, SEXP contSEXP, SEXP clust_sizesSEXP, SEXP nSEXP, SEXP abSEXP, SEXP obs_matSEXP, SEXP record_pairsSEXP, SEXP flatSEXP, SEXP rSEXP, SEXP r_1SEXP, SEXP valid_rpSEXP, SEXP singleton_indSEXP, SEXP rp_indSEXP, SEXP file_labelsSEXP, SEXP powersSEXP, SEXP LSEXP, SEXP num_fpSEXP, SEXP num_rpSEXP, SEXP num_fieldSEXP, SEXP rp_to_fpSEXP, SEXP level_cumSEXP, SEXP no_dupsSEXP, SEXP valid_fpSEXP, SEXP ccSEXP, SEXP Z_membersSEXP, SEXP clust_sizes_collapsedSEXP, SEXP indexing_usedSEXP, SEXP single_likelihoodSEXP, SEXP single_nusSEXP, SEXP single_abSEXP) {
+List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp, arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp, const arma::vec& mus, const arma::vec& nus, const arma::vec& alphas, int alpha_0, const arma::vec& dup_upper_bound, List dup_count_prior, const arma::vec& n_prior, arma::vec cont, arma::mat clust_sizes, int n, const arma::vec& ab, const arma::mat& obs_mat, const arma::umat& record_pairs, int flat, int r, int r_1, const arma::mat& valid_rp, const arma::vec& singleton_ind, const arma::umat& rp_ind, const arma::vec& file_labels, const arma::vec& powers, int L, int num_fp, int num_rp, int num_field, const arma::mat& rp_to_fp, const arma::vec& level_cum, int no_dups, const arma::vec& valid_fp, int cc, arma::umat Z_members, arma::vec clust_sizes_collapsed, int indexing_used, int single_likelihood, const arma::vec& single_nus, const arma::vec& single_ab, int num_chap_iter, int chap_type, const arma::vec& file_size_cum, const arma::umat& valid_fp_matrix, const arma::vec& fp_probs, List comparison_rps, int comparison_rps_length, int extra_gibbs, int num_restrict, const arma::umat& comparisons_chap, const arma::vec& comparison_rps_probs);
+RcppExport SEXP _multilink_gibbs_loop_rcpp(SEXP n_iterSEXP, SEXP Z_sampSEXP, SEXP clust_sizes_sampSEXP, SEXP cont_sampSEXP, SEXP m_sampSEXP, SEXP u_sampSEXP, SEXP musSEXP, SEXP nusSEXP, SEXP alphasSEXP, SEXP alpha_0SEXP, SEXP dup_upper_boundSEXP, SEXP dup_count_priorSEXP, SEXP n_priorSEXP, SEXP contSEXP, SEXP clust_sizesSEXP, SEXP nSEXP, SEXP abSEXP, SEXP obs_matSEXP, SEXP record_pairsSEXP, SEXP flatSEXP, SEXP rSEXP, SEXP r_1SEXP, SEXP valid_rpSEXP, SEXP singleton_indSEXP, SEXP rp_indSEXP, SEXP file_labelsSEXP, SEXP powersSEXP, SEXP LSEXP, SEXP num_fpSEXP, SEXP num_rpSEXP, SEXP num_fieldSEXP, SEXP rp_to_fpSEXP, SEXP level_cumSEXP, SEXP no_dupsSEXP, SEXP valid_fpSEXP, SEXP ccSEXP, SEXP Z_membersSEXP, SEXP clust_sizes_collapsedSEXP, SEXP indexing_usedSEXP, SEXP single_likelihoodSEXP, SEXP single_nusSEXP, SEXP single_abSEXP, SEXP num_chap_iterSEXP, SEXP chap_typeSEXP, SEXP file_size_cumSEXP, SEXP valid_fp_matrixSEXP, SEXP fp_probsSEXP, SEXP comparison_rpsSEXP, SEXP comparison_rps_lengthSEXP, SEXP extra_gibbsSEXP, SEXP num_restrictSEXP, SEXP comparisons_chapSEXP, SEXP comparison_rps_probsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -93,7 +93,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type single_likelihood(single_likelihoodSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type single_nus(single_nusSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type single_ab(single_abSEXP);
-    rcpp_result_gen = Rcpp::wrap(gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp, m_samp, u_samp, mus, nus, alphas, alpha_0, dup_upper_bound, dup_count_prior, n_prior, cont, clust_sizes, n, ab, obs_mat, record_pairs, flat, r, r_1, valid_rp, singleton_ind, rp_ind, file_labels, powers, L, num_fp, num_rp, num_field, rp_to_fp, level_cum, no_dups, valid_fp, cc, Z_members, clust_sizes_collapsed, indexing_used, single_likelihood, single_nus, single_ab));
+    Rcpp::traits::input_parameter< int >::type num_chap_iter(num_chap_iterSEXP);
+    Rcpp::traits::input_parameter< int >::type chap_type(chap_typeSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type file_size_cum(file_size_cumSEXP);
+    Rcpp::traits::input_parameter< const arma::umat& >::type valid_fp_matrix(valid_fp_matrixSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type fp_probs(fp_probsSEXP);
+    Rcpp::traits::input_parameter< List >::type comparison_rps(comparison_rpsSEXP);
+    Rcpp::traits::input_parameter< int >::type comparison_rps_length(comparison_rps_lengthSEXP);
+    Rcpp::traits::input_parameter< int >::type extra_gibbs(extra_gibbsSEXP);
+    Rcpp::traits::input_parameter< int >::type num_restrict(num_restrictSEXP);
+    Rcpp::traits::input_parameter< const arma::umat& >::type comparisons_chap(comparisons_chapSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type comparison_rps_probs(comparison_rps_probsSEXP);
+    rcpp_result_gen = Rcpp::wrap(gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp, m_samp, u_samp, mus, nus, alphas, alpha_0, dup_upper_bound, dup_count_prior, n_prior, cont, clust_sizes, n, ab, obs_mat, record_pairs, flat, r, r_1, valid_rp, singleton_ind, rp_ind, file_labels, powers, L, num_fp, num_rp, num_field, rp_to_fp, level_cum, no_dups, valid_fp, cc, Z_members, clust_sizes_collapsed, indexing_used, single_likelihood, single_nus, single_ab, num_chap_iter, chap_type, file_size_cum, valid_fp_matrix, fp_probs, comparison_rps, comparison_rps_length, extra_gibbs, num_restrict, comparisons_chap, comparison_rps_probs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -101,7 +112,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_multilink_get_posterior_loss_allcpp", (DL_FUNC) &_multilink_get_posterior_loss_allcpp, 6},
     {"_multilink_get_posterior_loss_abstain_cpp", (DL_FUNC) &_multilink_get_posterior_loss_abstain_cpp, 8},
-    {"_multilink_gibbs_loop_rcpp", (DL_FUNC) &_multilink_gibbs_loop_rcpp, 42},
+    {"_multilink_gibbs_loop_rcpp", (DL_FUNC) &_multilink_gibbs_loop_rcpp, 53},
     {NULL, NULL, 0}
 };
 

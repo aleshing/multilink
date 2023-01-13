@@ -6,22 +6,27 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
-                     arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp,
-                     const arma::vec& mus, const arma::vec& nus,
-                     const arma::vec& alphas, int alpha_0,
-                     const arma::vec& dup_upper_bound, List dup_count_prior,
-                     const arma::vec& n_prior, arma::vec cont,
-                     arma::mat clust_sizes, int n, const arma::vec& ab,
-                     const arma::mat& obs_mat, const arma::umat& record_pairs,
-                     int flat, int r, int r_1, const arma::mat& valid_rp,
-                     const arma::vec& singleton_ind, const arma::umat& rp_ind,
-                     const arma::vec& file_labels, const arma::vec& powers,
-                     int L, int num_fp, int num_rp, int num_field,
-                     const arma::mat& rp_to_fp, const arma::vec& level_cum,
-                     int no_dups, const arma::vec& valid_fp, int cc,
-                     arma::umat Z_members, arma::vec clust_sizes_collapsed,
-                     int indexing_used, int single_likelihood,
-                     const arma::vec& single_nus, const arma::vec& single_ab){
+                          arma::mat cont_samp, arma::mat m_samp, arma::mat u_samp,
+                          const arma::vec& mus, const arma::vec& nus,
+                          const arma::vec& alphas, int alpha_0,
+                          const arma::vec& dup_upper_bound, List dup_count_prior,
+                          const arma::vec& n_prior, arma::vec cont,
+                          arma::mat clust_sizes, int n, const arma::vec& ab,
+                          const arma::mat& obs_mat, const arma::umat& record_pairs,
+                          int flat, int r, int r_1, const arma::mat& valid_rp,
+                          const arma::vec& singleton_ind, const arma::umat& rp_ind,
+                          const arma::vec& file_labels, const arma::vec& powers,
+                          int L, int num_fp, int num_rp, int num_field,
+                          const arma::mat& rp_to_fp, const arma::vec& level_cum,
+                          int no_dups, const arma::vec& valid_fp, int cc,
+                          arma::umat Z_members, arma::vec clust_sizes_collapsed,
+                          int indexing_used, int single_likelihood,
+                          const arma::vec& single_nus, const arma::vec& single_ab,
+                          int num_chap_iter, int chap_type, const arma::vec& file_size_cum,
+                          const arma::umat& valid_fp_matrix, const arma::vec& fp_probs,
+                          List comparison_rps, int comparison_rps_length,
+                          int extra_gibbs, int num_restrict, const arma::umat& comparisons_chap,
+                          const arma::vec& comparison_rps_probs){
     for(int i = 1; i < n_iter; i++){
         //// Every 10 iterations check to see if the user has interrupted the
         //// sampler
@@ -55,11 +60,27 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
         //// Inner Gibbs loop: Fixed scan of cluster assignments for records
         //// Use labels from the end of iteration i-1 for the start of iteration
         //// i
-        List Z = sample_Z_rcpp(Z_curr, clust_sizes, n, cont, log_like, alphas,
-                               alpha_0, dup_upper_bound, dup_count_prior,
-                               n_prior, r, r_1, valid_rp, singleton_ind, rp_ind,
-                               file_labels, powers, flat, no_dups, cc,
-                               Z_members, clust_sizes_collapsed, indexing_used);
+        List Z;
+        if(chap_type == -1){
+            Z = sample_Z_rcpp(Z_curr, clust_sizes, n, cont, log_like, alphas,
+                              alpha_0, dup_upper_bound, dup_count_prior,
+                              n_prior, r, r_1, valid_rp, singleton_ind, rp_ind,
+                              file_labels, powers, flat, no_dups, cc,
+                              Z_members, clust_sizes_collapsed, indexing_used);
+        }
+        else{
+            Z = sample_Z_rcpp_chaperones(Z_curr, clust_sizes, n, cont, log_like, alphas,
+                                         alpha_0, dup_upper_bound, dup_count_prior,
+                                         n_prior, r, r_1, valid_rp, singleton_ind, rp_ind,
+                                         file_labels, powers, flat, no_dups, cc,
+                                         Z_members, clust_sizes_collapsed, indexing_used,
+                                         num_chap_iter, num_rp, chap_type, file_size_cum,
+                                         valid_fp_matrix, fp_probs, record_pairs,
+                                         comparison_rps, comparison_rps_length,
+                                         extra_gibbs, num_restrict, comparisons_chap,
+                                         num_field, comparison_rps_probs);
+        }
+
 
         Z_samp.col(i) = as<arma::vec>(Z["Z"]);
         cont = as<arma::vec>(Z["cont"]);
@@ -76,3 +97,4 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
                         Named("cont_samp") = cont_samp,
                         Named("clust_sizes_samp") = clust_sizes_samp));
 }
+

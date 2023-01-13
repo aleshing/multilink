@@ -10,7 +10,8 @@ gibbs_sampler(
   n_iter = 2000,
   Z_init = 1:sum(comparison_list$file_sizes),
   seed = 70,
-  single_likelihood = FALSE
+  single_likelihood = FALSE,
+  chaperones_info = NA
 )
 }
 \arguments{
@@ -35,6 +36,23 @@ separate likelihood for comparisons for each file pair. When
 \code{single_likelihood=TRUE}, a single likelihood is used, and the prior
 hyperparameters for \code{m} and \code{u} from the first file pair are used.
 We do not recommend using a single likelihood in general.}
+
+\item{chaperones_info}{If \code{chaperones_info} is set to \code{NA}, then
+Gibbs updates to the partition are used during the Gibbs sampler. Else,
+\code{chaperones_info} should be a \code{list} with five elements
+controlling Chaperones updates to the partition during the Gibbs sampler:
+\code{chap_type}, \code{num_chap_iter}, \code{nonuniform_chap_type},
+\code{extra_gibbs}, \code{num_restrict}. \code{chap_type} is \code{0} if
+using a uniform Chaperones distribution, and \code{1} if
+using a nonuniform Chaperones distribution. \code{num_chap_iter} is the
+number of Chaperones updates to the partition that are made during each
+iteration of the Gibbs sampler. When using a nonuniform Chaperones
+distribution, \code{nonuniform_chap_type} is \code{0} if using the exact
+version, or \code{1} if using the partial version. \code{extra_gibbs} is a
+\code{logical} indicator of whether a Gibbs update to the partition should be
+done after the Chaperones updates, at each iteration of the Gibbs sampler.
+\code{num_restrict} is the number of restricted Gibbs steps to take during
+each Chaperones update to the partition.}
 }
 \value{
 a list containing:
