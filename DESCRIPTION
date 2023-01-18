@@ -1,12 +1,15 @@
 Package: multilink
 Title: Multifile Record Linkage and Duplicate Detection
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Serge",
            family = "Aleshin-Guendel",
            role = c("aut", "cre"),
-           email = "aleshing@uw.edu")
-Description: This is a package that implements methodology for multifile record linkage and duplicate detection.
+           email = "saleshinguendel@gmail.com")
+Description: This package implements the methodology of Aleshin-Guendel & 
+Sadinle (2022) <doi:10.1080/01621459.2021.2013242>. It handles the general 
+problem of multifile record linkage and duplicate detection.
+Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

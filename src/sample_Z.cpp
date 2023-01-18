@@ -423,8 +423,8 @@ List sample_Z_rcpp_chaperones(arma::vec Z, arma::mat clust_sizes, int n, arma::v
     // Perform num_chap_iter Chaperones updates
     for(int t = 0; t < num_chap_iter; t++){
         // Sample Chaperones
-        int chaperone_1;
-        int chaperone_2;
+        int chaperone_1 = -99;
+        int chaperone_2 = -99;
         // Uniform Chaperones distribution
         if(chap_type == 0){
             IntegerVector chaperones =
