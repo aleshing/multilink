@@ -7,11 +7,11 @@
 relabel_bayes_estimate(reduced_comparison_list, bayes_estimate)
 }
 \arguments{
+\item{reduced_comparison_list}{The output from a call to
+\code{\link{reduce_comparison_data}}.}
+
 \item{bayes_estimate}{The output from a call to
 \code{\link{find_bayes_estimate}}.}
-
-\item{comparison_list}{The output from a call to
-\code{\link{reduce_comparison_data}}.}
 }
 \value{
 A \code{data.frame}, with as many rows as

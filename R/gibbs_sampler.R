@@ -434,7 +434,7 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     comparison_rps_probs <- c(1 / (FF + 1))
     counter <- 1
     for(i in 1:FF){
-        combinations <- combn(FF, i)
+        combinations <- utils::combn(FF, i)
         for(j in 1:ncol(combinations)){
             cols <- combinations[, j]
             if(i == 1){

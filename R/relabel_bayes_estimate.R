@@ -15,7 +15,7 @@
 #' \code{\link{reduce_comparison_data}} is used, so that the user doesn't have
 #' to do this relabeling themselves.
 #'
-#' @param comparison_list The output from a call to
+#' @param reduced_comparison_list The output from a call to
 #' \code{\link{reduce_comparison_data}}.
 #' @param bayes_estimate The output from a call to
 #' \code{\link{find_bayes_estimate}}.
