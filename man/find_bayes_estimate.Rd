@@ -139,3 +139,7 @@ partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 }
 }
+\references{
+Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the
+American Statistical Association}. [\href{https://doi.org/10.1080/01621459.2021.2013242}{Published}] [\href{https://arxiv.org/abs/2110.03839}{arXiv}]
+}

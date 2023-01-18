@@ -30,6 +30,9 @@
 #' record \code{j} with \code{l} in index \code{j}. A value of \code{-1} in
 #' index \code{i} indicates that the Bayes estimate abstained from  making a
 #' decision for record \code{i}.
+#' @references Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the
+#' American Statistical Association}. [\href{https://doi.org/10.1080/01621459.2021.2013242}{Published}] [\href{https://arxiv.org/abs/2110.03839}{arXiv}]
+#'
 #' @export
 #'
 #' @examples

@@ -38,8 +38,10 @@ hyperparameters for \code{m} and \code{u} from the first file pair are used.
 We do not recommend using a single likelihood in general.}
 
 \item{chaperones_info}{If \code{chaperones_info} is set to \code{NA}, then
-Gibbs updates to the partition are used during the Gibbs sampler. Else,
-\code{chaperones_info} should be a \code{list} with five elements
+Gibbs updates to the partition are used during the Gibbs sampler, as
+described in Aleshin-Guendel & Sadinle (2022). Else, Chaperones updates,
+as described in Miller et al. (2015) and Betancourt et al. (2016), are used
+and \code{chaperones_info} should be a \code{list} with five elements
 controlling Chaperones updates to the partition during the Gibbs sampler:
 \code{chap_type}, \code{num_chap_iter}, \code{nonuniform_chap_type},
 \code{extra_gibbs}, \code{num_restrict}. \code{chap_type} is \code{0} if
@@ -151,4 +153,16 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 }
+}
+\references{
+Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the
+American Statistical Association}. [\href{https://doi.org/10.1080/01621459.2021.2013242}{Published}] [\href{https://arxiv.org/abs/2110.03839}{arXiv}]
+
+Jeffrey Miller, Brenda Betancourt, Abbas Zaidi, Hanna Wallach, & Rebecca C. Steorts (2015).
+Microclustering: When the cluster sizes grow sublinearly with the size of the data set.
+\emph{NeurIPS Bayesian Nonparametrics: The Next Generation Workshop Series}. [\href{https://arxiv.org/abs/1512.00792}{arXiv}]
+
+Brenda Betancourt, Giacomo Zanella, Jeffrey Miller, Hanna Wallach, Abbas Zaidi, & Rebecca C. Steorts (2016).
+Flexible Models for Microclustering with Application to Entity Resolution.
+\emph{Advances in neural information processing systems}. [\href{https://proceedings.neurips.cc/paper/2016/hash/670e8a43b246801ca1eaca97b3e19189-Abstract.html}{Published}] [\href{https://arxiv.org/abs/1610.09780}{arXiv}]
 }
