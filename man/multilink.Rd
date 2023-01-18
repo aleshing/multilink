@@ -6,9 +6,9 @@
 \title{Multifile Record Linkage and Duplicate Detection}
 \description{
 The multilink package implements the methodology of Aleshin-Guendel & Sadinle
-(2022) <doi:10.1080/01621459.2021.2013242>. It handles the general problem of
-multifile record linkage and duplicate detection, where any number of files
-are to be linked, and any of the files may have duplicates.
+(2022). It handles the general problem of multifile record linkage and
+duplicate detection, where any number of files are to be linked, and any of
+the files may have duplicates.
 }
 \examples{
 # Here we demonstrate an example workflow with the no duplicate dataset
