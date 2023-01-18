@@ -64,18 +64,15 @@
 #'  n_prior_family = "uniform", n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
-#' # Takes around 10 seconds
 #' \dontrun{
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #'
 #' # Find the full Bayes estimate
-#' # Takes a couple of seconds
 #' full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 #'
 #' # Find the partial Bayes estimate
-#' # Takes around 15 seconds
 #' partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 #'

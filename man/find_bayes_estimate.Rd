@@ -80,18 +80,15 @@ pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
 Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 
 # Run the Gibbs sampler
-# Takes around 2 and a half minutes
 \dontrun{
 results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
  Z_init = Z_init, seed = 42)
 
 # Find the full Bayes estimate
-# Takes a couple of seconds
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 
 # Find the partial Bayes estimate
-# Takes around 20 seconds
 partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 }
@@ -123,18 +120,15 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_family = "uniform", n_prior_pars = NA)
 
 # Run the Gibbs sampler
-# Takes around 10 seconds
 \dontrun{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 
 # Find the full Bayes estimate
-# Takes a couple of seconds
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 
 # Find the partial Bayes estimate
-# Takes around 15 seconds
 partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 }
