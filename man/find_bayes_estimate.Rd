@@ -94,6 +94,7 @@ partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 }
 
 # Example with duplicate dataset
+\dontrun{
 data(dup_data)
 
 # Create the comparison data
@@ -120,7 +121,6 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_family = "uniform", n_prior_pars = NA)
 
 # Run the Gibbs sampler
-\dontrun{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 

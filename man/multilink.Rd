@@ -98,6 +98,7 @@ true_matches_A / sum(partial_estimate_links)
 }
 
 # Here we demonstrate an example workflow with the duplicate dataset
+\dontrun{
 data(dup_data)
 
 # Create the comparison data
@@ -124,7 +125,6 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_pars = NA)
 
 # Run the Gibbs sampler
-\dontrun{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 

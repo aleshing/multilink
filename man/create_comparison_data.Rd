@@ -144,6 +144,7 @@ comparison_list <- create_comparison_data(no_dup_data$records,
  duplicates = c(0, 0, 0))
 
 ## Example with duplicate dataset
+\dontrun{
 data(dup_data)
 
 # Create the comparison data
@@ -153,6 +154,7 @@ comparison_list <- create_comparison_data(dup_data$records,
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
  file_sizes = dup_data$file_sizes,
  duplicates = c(1, 1, 1))
+ }
 }
 \references{
 Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the
