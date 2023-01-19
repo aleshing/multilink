@@ -57,7 +57,7 @@ arma::rowvec get_FM2_loss(int TT, int r, const arma::umat& running,
         arma::mat temp_loss = arma::zeros<arma::mat>(TT, TT);
         arma::mat temp_prod = arma::zeros<arma::mat>(TT, TT);
         for(int t = 0; t < TT; t++){
-            if(!running(i, t) & (A(i, t) != r - 1)){
+            if(!running(i, t) && (A(i, t) != r - 1)){
                 if(same_part(t) > -1){
                     temp_loss.row(t) = temp_loss.row(same_part(t));
                 }
