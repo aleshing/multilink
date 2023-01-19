@@ -134,6 +134,7 @@
 #'  duplicates = c(0, 0, 0))
 #'
 #' ## Example with duplicate dataset
+#' \dontrun{
 #' data(dup_data)
 #'
 #' # Create the comparison data
@@ -143,6 +144,7 @@
 #'                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
 #'  file_sizes = dup_data$file_sizes,
 #'  duplicates = c(1, 1, 1))
+#'  }
 create_comparison_data <- function(records, types, breaks, file_sizes,
                                    duplicates){
     # Input Checks
