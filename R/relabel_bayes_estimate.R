@@ -28,7 +28,7 @@
 #' indexing occurred. This \code{data.frame} has two columns,
 #' \code{"original_labels"} and \code{"link_id"}. Given row \code{i} of
 #' \code{records} originally input to \code{\link{create_comparison_data}},
-#' the linkage id accoridng to \code{bayes_estimate} is given by the \code{i}th
+#' the linkage id according to \code{bayes_estimate} is given by the \code{i}th
 #' row of the \code{link_id} column. See the documentation for
 #' \code{\link{find_bayes_estimate}} for information on how to interpret this
 #' linkage id.

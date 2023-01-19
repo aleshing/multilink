@@ -99,7 +99,7 @@
 #'   \item{\code{rp_to_fp}}{A \code{logical} matrix that indicates which record
 #'   pairs belong to which file pairs. \code{rp_to_fp[fp, rp]} is \code{TRUE} if
 #'   the records  \code{record_pairs[rp, ]} belong to the file pair \code{fp},
-#'   and is FALSE otherwise. Note that \code{fp} is given by the labelling in
+#'   and is FALSE otherwise. Note that \code{fp} is given by the labeling in
 #'   \code{fp_matrix}.}
 #'   \item{\code{ab}}{An \code{integer} vector, of length
 #'   \code{ncol(comparisons) * K * (K + 1) / 2} that indicates how many record
