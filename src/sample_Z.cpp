@@ -171,7 +171,7 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                         int temp = valid_c(i);
                         if(npc_counter < npc_size){
                             int temp_npc = not_possible_c(npc_counter);
-                            while(npc_counter < npc_size & temp_npc <= temp){
+                            while((npc_counter < npc_size) & (temp_npc <= temp)){
                                 if(temp == temp_npc){
                                     valid_c(i) = -1;
                                     empty_counter++;
@@ -231,7 +231,7 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                         }
                         else if(npc_counter < npc_size){
                             int temp_npc = not_possible_c(npc_counter);
-                            while(npc_counter < npc_size & temp_npc <= temp){
+                            while((npc_counter < npc_size) & (temp_npc <= temp)){
                                 if(temp == temp_npc){
                                     possible_c(i) = -1;
                                 }
@@ -467,7 +467,7 @@ List sample_Z_rcpp_chaperones(arma::vec Z, arma::mat clust_sizes, int n, arma::v
                 arma::vec valid_c = arma::vec(2);
                 int no_move_flag = 0;
 
-                if(j == chaperone_1 | j == chaperone_2){
+                if((j == chaperone_1) | (j == chaperone_2)){
                     if(label_1 == label_2){
                         // Two possible clusters, stay or make singleton
                         valid_c(0) = label;
