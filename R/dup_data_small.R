@@ -1,7 +1,7 @@
-#' Duplicate Dataset
+#' Small Duplicate Dataset
 #'
-#' A dataset containing \code{867} simulated records from \code{3} files with
-#' no duplicate records in each file.
+#' A dataset containing \code{53} simulated records from \code{3} files with
+#' no duplicate records in each file, subset from \code{\link{dup_data}}.
 #'
 #' @format A list with three elements:
 #' \describe{
@@ -20,8 +20,8 @@
 #' American Statistical Association}. [\doi{https://doi.org/10.1080/01621459.2021.2013242}][\href{https://arxiv.org/abs/2110.03839}{arXiv}]
 #'
 #' @examples
-#' data(dup_data)
+#' data(dup_data_small)
 #'
-#' # There are 500 entities represented in the records
-#' length(unique(dup_data$IDs))
-"dup_data"
+#' # There are 53 entities represented in the records
+#' length(unique(dup_data_small$IDs))
+"dup_data_small"

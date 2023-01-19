@@ -1,7 +1,7 @@
-#' Duplicate Dataset
+#' Small No Duplicate Dataset
 #'
-#' A dataset containing \code{867} simulated records from \code{3} files with
-#' no duplicate records in each file.
+#' A dataset containing \code{42} simulated records from \code{3} files with
+#' no duplicate records in each file, subset from \code{\link{no_dup_data}}.
 #'
 #' @format A list with three elements:
 #' \describe{
@@ -17,11 +17,10 @@
 #' paper. The datasets were generated using code from Peter Christen's group
 #' \url{https://dmm.anu.edu.au/geco/index.php}.
 #' @references Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the
-#' American Statistical Association}. [\doi{https://doi.org/10.1080/01621459.2021.2013242}][\href{https://arxiv.org/abs/2110.03839}{arXiv}]
-#'
+#' American Statistical Association}. [\doi{https://doi.org/10.1080/01621459.2021.2013242}] [\href{https://arxiv.org/abs/2110.03839}{arXiv}]
 #' @examples
-#' data(dup_data)
+#' data(no_dup_data_small)
 #'
-#' # There are 500 entities represented in the records
-#' length(unique(dup_data$IDs))
-"dup_data"
+#' # There are 42 entities represented in the records
+#' length(unique(no_dup_data_small$IDs))
+"no_dup_data_small"
