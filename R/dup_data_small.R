@@ -1,6 +1,6 @@
 #' Small Duplicate Dataset
 #'
-#' A dataset containing \code{53} simulated records from \code{3} files with
+#' A dataset containing \code{96} simulated records from \code{3} files with
 #' no duplicate records in each file, subset from \code{\link{dup_data}}.
 #'
 #' @format A list with three elements:
@@ -22,6 +22,6 @@
 #' @examples
 #' data(dup_data_small)
 #'
-#' # There are 53 entities represented in the records
+#' # There are 96 entities represented in the records
 #' length(unique(dup_data_small$IDs))
 "dup_data_small"

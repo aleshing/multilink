@@ -180,15 +180,15 @@ Please contact the package maintainer if you need new prior families
 for \code{n} or the number of duplicates in each cluster to be supported.
 }
 \examples{
-# Example with no duplicate dataset
-data(no_dup_data)
+# Example with small no duplicate dataset
+data(no_dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(no_dup_data$records,
+comparison_list <- create_comparison_data(no_dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = no_dup_data$file_sizes,
+ file_sizes = no_dup_data_small$file_sizes,
  duplicates = c(0, 0, 0))
 
 # Specify the prior
@@ -197,20 +197,20 @@ prior_list <- specify_prior(comparison_list, mus = NA, nus = NA, flat = 0,
  dup_count_prior_family = NA, dup_count_prior_pars = NA,
  n_prior_family = "uniform", n_prior_pars = NA)
 
-# Example with duplicate dataset
-data(dup_data)
+# Example with small duplicate dataset
+data(dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(dup_data$records,
+comparison_list <- create_comparison_data(dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = dup_data$file_sizes,
+ file_sizes = dup_data_small$file_sizes,
  duplicates = c(1, 1, 1))
 
 # Reduce the comparison data
-# Use indexing to only keep pairs of records for which neither gname nor
-# fname disagree at the highest level
+# The following line corresponds to only keeping pairs of records for which
+# neither gname nor fname disagree at the highest level
 pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
  (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
 reduced_comparison_list <- reduce_comparison_data(comparison_list,
@@ -220,8 +220,8 @@ reduced_comparison_list <- reduce_comparison_data(comparison_list,
 prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  flat = 0, alphas = rep(1, 7), dup_upper_bound = c(10, 10, 10),
  dup_count_prior_family = c("Poisson", "Poisson", "Poisson"),
- dup_count_prior_pars = list(c(1), c(1), c(1)),
- n_prior_family = "uniform", n_prior_pars = NA)
+ dup_count_prior_pars = list(c(1), c(1), c(1)), n_prior_family = "uniform",
+ n_prior_pars = NA)
 }
 \references{
 Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the

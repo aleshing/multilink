@@ -25,13 +25,13 @@ paper. The datasets were generated using code from Peter Christen's group
 no_dup_data_small
 }
 \description{
-A dataset containing \code{42} simulated records from \code{3} files with
+A dataset containing \code{71} simulated records from \code{3} files with
 no duplicate records in each file, subset from \code{\link{no_dup_data}}.
 }
 \examples{
 data(no_dup_data_small)
 
-# There are 42 entities represented in the records
+# There are 71 entities represented in the records
 length(unique(no_dup_data_small$IDs))
 }
 \references{

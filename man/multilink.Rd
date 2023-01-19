@@ -11,15 +11,15 @@ duplicate detection, where any number of files are to be linked, and any of
 the files may have duplicates.
 }
 \examples{
-# Here we demonstrate an example workflow with the no duplicate dataset
-data(no_dup_data)
+# Here we demonstrate an example workflow with the small no duplicate dataset
+data(no_dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(no_dup_data$records,
+comparison_list <- create_comparison_data(no_dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = no_dup_data$file_sizes,
+ file_sizes = no_dup_data_small$file_sizes,
  duplicates = c(0, 0, 0))
 
 # Specify the prior
@@ -45,14 +45,14 @@ results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 
-# There are 492 clusters in the full estimate
+# The number of clusters in the full estimate
 length(unique(full_estimate))
-# There are 500 entities represented in the records
-length(unique(no_dup_data$IDs))
+# The number of entities represented in the records
+length(unique(no_dup_data_small$IDs))
 
 # Find which record pairs are truly coreferent based on IDs
-true_links <- no_dup_data$IDs[comparison_list$record_pairs[, 1]] ==
-no_dup_data$IDs[comparison_list$record_pairs[, 2]]
+true_links <- no_dup_data_small$IDs[comparison_list$record_pairs[, 1]] ==
+no_dup_data_small$IDs[comparison_list$record_pairs[, 2]]
 
 # Find which record pairs are in the same clusters in the full estimate
 full_estimate_links <- full_estimate[comparison_list$record_pairs[, 1]] ==
@@ -61,24 +61,24 @@ full_estimate[comparison_list$record_pairs[, 2]]
 # Find the number of true matches in the full estimate
 true_matches <- sum(full_estimate_links & true_links)
 
-# Precision of the full estimate is 0.96
+# Precision of the full estimate
 true_matches / sum(full_estimate_links)
 
-# Recall of the full estimate is 1
+# Recall of the full estimate
 true_matches / sum(true_links)
 
 # Find the partial Bayes estimate
 partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 
-# The partial estimate abstains from making decisions for 28 records
+# The partial estimate abstains from making decisions for how many records?
 sum(partial_estimate == -1)
 
 # For the records which decisions were made for in the partial estimate,
-# there are 473 clusters
+# there are how many clusters?
 length(unique(partial_estimate))
 
-# Abstain rate of partial_estimate is 0.04
+# Abstain rate of partial_estimate
 sum(partial_estimate == -1) / length(partial_estimate)
 
 # Relabel records where we abstained
@@ -93,20 +93,19 @@ partial_estimate_links <-
 # Find the number of true matches in the partial estimate
 true_matches_A <- sum(partial_estimate_links & true_links)
 
-# Precision of the partial estimate is 0.98
+# Precision of the partial estimate
 true_matches_A / sum(partial_estimate_links)
 }
 
-# Here we demonstrate an example workflow with the duplicate dataset
-\dontrun{
-data(dup_data)
+# Here we demonstrate an example workflow with the small duplicate dataset
+data(dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(dup_data$records,
+comparison_list <- create_comparison_data(dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = dup_data$file_sizes,
+ file_sizes = dup_data_small$file_sizes,
  duplicates = c(1, 1, 1))
 
 # Reduce the comparison data
@@ -125,6 +124,7 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_pars = NA)
 
 # Run the Gibbs sampler
+\dontrun{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 
@@ -132,17 +132,17 @@ results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 
-# There are 495 clusters in the full estimate (including records records
+# The number of  clusters in the full estimate (including records records
 # determined not to be candidate matches to any other records using
 # reduce_comparison_data)
 length(unique(full_estimate)) +
 sum(reduced_comparison_list$file_sizes_not_included)
-# There are 500 entities represented in the records
-length(unique(dup_data$IDs))
+# The number of entities represented in the records
+length(unique(dup_data_small$IDs))
 
 # Find which record pairs are truly coreferent based on IDs
-true_links <- dup_data$IDs[comparison_list$record_pairs[, 1]] ==
-dup_data$IDs[comparison_list$record_pairs[, 2]]
+true_links <- dup_data_small$IDs[comparison_list$record_pairs[, 1]] ==
+dup_data_small$IDs[comparison_list$record_pairs[, 2]]
 
 # Focus on the record pairs that were candidate matches
 true_links_reduced <- true_links[reduced_comparison_list$pairs_to_keep]
@@ -161,26 +161,26 @@ full_estimate_links <-
 # Find the number of true matches in the full estimate
 true_matches <- sum(full_estimate_links & true_links_reduced)
 
-# Precision of the full estimate is 0.95
+# Precision of the full estimate
 true_matches / sum(full_estimate_links)
 
-# Recall of the full estimate is 0.99
+# Recall of the full estimate
 true_matches / (sum(true_links_reduced) + prior_fnm)
 
 # Find the partial Bayes estimate
 partial_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = 0.1, max_cc_size = 12)
 
-# The partial estimate abstains from making decisions for 3 records
+# The partial estimate abstains from making decisions for how many records?
 sum(partial_estimate == -1)
 
 # For the records which decisions were made for in the partial estimate,
-# there are 495 clusters (including records determined not to be candidate
-# matches to any other records using reduce_comparison_data)
+# there are how many clusters? (including records determined not to be
+# candidate matches to any other records using reduce_comparison_data)
 length(unique(partial_estimate)) +
  sum(reduced_comparison_list$file_sizes_not_included)
 
-# Abstain rate of partial_estimate is 0.004 (excluding records determined not
+# Abstain rate of partial_estimat (excluding records determined not
 # to be candidate matches to any other records using reduce_comparison_data)
 sum(partial_estimate == -1) / length(partial_estimate)
 
@@ -196,21 +196,21 @@ partial_estimate_links <-
 # Find the number of true matches in the partial estimate
 true_matches_A <- sum(partial_estimate_links & true_links_reduced)
 
-# Precision of the partial estimate is 0.96
+# Precision of the partial estimate
 true_matches_A / sum(partial_estimate_links)
 
 # Relabel the full and partial Bayes estimates
 full_estimate_relabel <- relabel_bayes_estimate(reduced_comparison_list,
  full_estimate)
 
- partial_estimate_relabel <- relabel_bayes_estimate(reduced_comparison_list,
-  partial_estimate)
+partial_estimate_relabel <- relabel_bayes_estimate(reduced_comparison_list,
+ partial_estimate)
 
- # Add columns to the records corresponding to their full and partial
- # Bayes estimates
- dup_data$records <- cbind(dup_data$records,
-  full_estimate_id = full_estimate_relabel$link_id,
-  partial_estimate_id = partial_estimate_relabel$link_id)
+# Add columns to the records corresponding to their full and partial
+# Bayes estimates
+dup_data_small$records <- cbind(dup_data_small$records,
+ full_estimate_id = full_estimate_relabel$link_id,
+ partial_estimate_id = partial_estimate_relabel$link_id)
 }
 
 

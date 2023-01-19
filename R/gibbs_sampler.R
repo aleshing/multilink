@@ -75,16 +75,15 @@
 #' \emph{Advances in neural information processing systems}. [\href{https://proceedings.neurips.cc/paper/2016/hash/670e8a43b246801ca1eaca97b3e19189-Abstract.html}{Published}] [\href{https://arxiv.org/abs/1610.09780}{arXiv}]
 #' @export
 #'
-#' @examples
-#' # Example with no duplicate dataset
-#' data(no_dup_data)
+#' @examples#' # Example with small no duplicate dataset
+#' data(no_dup_data_small)
 #'
 #' # Create the comparison data
-#' comparison_list <- create_comparison_data(no_dup_data$records,
+#' comparison_list <- create_comparison_data(no_dup_data_small$records,
 #'  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
 #'  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
-#'                c(0, 0.25, 0.5),  c(0, 0.25, 0.5),  NA, NA),
-#'  file_sizes = no_dup_data$file_sizes,
+#'                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
+#'  file_sizes = no_dup_data_small$file_sizes,
 #'  duplicates = c(0, 0, 0))
 #'
 #' # Specify the prior
@@ -93,7 +92,7 @@
 #'  dup_count_prior_family = NA, dup_count_prior_pars = NA,
 #'  n_prior_family = "uniform", n_prior_pars = NA)
 #'
-#' # Find initialization for the matching
+#' # Find initialization for the matching (this step is optional)
 #' # The following line corresponds to only keeping pairs of records as
 #' # potential matches in the initialization for which neither gname nor fname
 #' # disagree at the highest level
@@ -107,16 +106,15 @@
 #'  Z_init = Z_init, seed = 42)
 #' }
 #'
-#' # Example with duplicate dataset
-#' \dontrun{
-#' data(dup_data)
+#' # Example with small duplicate dataset
+#' data(dup_data_small)
 #'
 #' # Create the comparison data
-#' comparison_list <- create_comparison_data(dup_data$records,
-#' types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
+#' comparison_list <- create_comparison_data(dup_data_small$records,
+#'  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
 #'  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
 #'                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
-#'  file_sizes = dup_data$file_sizes,
+#'  file_sizes = dup_data_small$file_sizes,
 #'  duplicates = c(1, 1, 1))
 #'
 #' # Reduce the comparison data
@@ -131,10 +129,11 @@
 #' prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
 #'  flat = 0, alphas = rep(1, 7), dup_upper_bound = c(10, 10, 10),
 #'  dup_count_prior_family = c("Poisson", "Poisson", "Poisson"),
-#'  dup_count_prior_pars = list(c(1), c(1), c(1)),
-#'  n_prior_family = "uniform", n_prior_pars = NA)
+#'  dup_count_prior_pars = list(c(1), c(1), c(1)), n_prior_family = "uniform",
+#'  n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
+#' \dontrun{
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #' }

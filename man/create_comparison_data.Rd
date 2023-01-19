@@ -132,29 +132,27 @@ the lowest level of disagreement for a comparison, while the interval
 \eqn{I_L} corresponds to the highest level of disagreement for a comparison.
 }
 \examples{
-## Example with no duplicate dataset
-data(no_dup_data)
+## Example with small no duplicate dataset
+data(no_dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(no_dup_data$records,
+comparison_list <- create_comparison_data(no_dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = no_dup_data$file_sizes,
+ file_sizes = no_dup_data_small$file_sizes,
  duplicates = c(0, 0, 0))
 
-## Example with duplicate dataset
-\dontrun{
-data(dup_data)
+## Example with small duplicate dataset
+data(dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(dup_data$records,
+comparison_list <- create_comparison_data(dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = dup_data$file_sizes,
+ file_sizes = dup_data_small$file_sizes,
  duplicates = c(1, 1, 1))
- }
 }
 \references{
 Serge Aleshin-Guendel & Mauricio Sadinle (2022). Multifile Partitioning for Record Linkage and Duplicate Detection. \emph{Journal of the

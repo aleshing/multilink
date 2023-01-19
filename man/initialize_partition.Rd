@@ -50,20 +50,21 @@ these selected records are then placed in the same cluster for the partition
 initialization. All other records are placed in their own clusters.
 }
 \examples{
-# Example with no duplicate dataset
-data(no_dup_data)
+# Example with small no duplicate dataset
+data(no_dup_data_small)
 
 # Create the comparison data
-comparison_list <- create_comparison_data(no_dup_data$records,
+comparison_list <- create_comparison_data(no_dup_data_small$records,
  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
- file_sizes = no_dup_data$file_sizes,
+ file_sizes = no_dup_data_small$file_sizes,
  duplicates = c(0, 0, 0))
 
 # Find initialization for the matching
-# Only keep pairs of records as potential matches in the initialization for
-# which neither gname nor fname disagree at the highest level
+# The following line corresponds to only keeping pairs of records as
+# potential matches in the initialization for which neither gname nor fname
+# disagree at the highest level
 pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
  (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
 Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)

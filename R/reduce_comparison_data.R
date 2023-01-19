@@ -115,20 +115,20 @@
 #' @export
 #'
 #' @examples
-#' # Example with duplicate dataset
-#' data(dup_data)
+#' # Example with small duplicate dataset
+#' data(dup_data_small)
 #'
 #' # Create the comparison data
-#' comparison_list <- create_comparison_data(dup_data$records,
+#' comparison_list <- create_comparison_data(dup_data_small$records,
 #'  types = c("bi", "lv", "lv", "lv", "lv", "bi", "bi"),
 #'  breaks = list(NA,  c(0, 0.25, 0.5),  c(0, 0.25, 0.5),
 #'                c(0, 0.25, 0.5), c(0, 0.25, 0.5),  NA, NA),
-#'  file_sizes = dup_data$file_sizes,
+#'  file_sizes = dup_data_small$file_sizes,
 #'  duplicates = c(1, 1, 1))
 #'
 #' # Reduce the comparison data
-#' # Use indexing to only keep pairs of records for which neither gname nor
-#' # fname disagree at the highest level
+#' # The following line corresponds to only keeping pairs of records for which
+#' # neither gname nor fname disagree at the highest level
 #' pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
 #'  (comparison_list$comparisons[, "fname_DL_3"] != TRUE)
 #' reduced_comparison_list <- reduce_comparison_data(comparison_list,
