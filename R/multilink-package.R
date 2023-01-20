@@ -35,11 +35,11 @@
 #' Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
 #' results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
 #'  Z_init = Z_init, seed = 42)
 #'
 #' # Find the full Bayes estimate
+#' \donttest{
 #' full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 #'
@@ -122,11 +122,11 @@
 #'  n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #'
 #' # Find the full Bayes estimate
+#' \donttest{
 #' full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 #'

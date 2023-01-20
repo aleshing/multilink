@@ -21,6 +21,8 @@
 #' \code{10-12}, then increasing based on a computational budget (although an
 #' increase of \code{1} in this argument can in the worst case lead to a
 #' doubling in computation time).
+#' @param verbose A \code{logical} indicator of whether progress messages should
+#' be print (default \code{TRUE}).
 #'
 #' @return
 #' A vector, the same length of a column of \code{partitions} containing the
@@ -62,11 +64,11 @@
 #' Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
 #' results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
 #'  Z_init = Z_init, seed = 42)
 #'
 #' # Find the full Bayes estimate
+#' \donttest{
 #' full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 #'
@@ -102,11 +104,11 @@
 #'  n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #'
 #' # Find the full Bayes estimate
+#' \donttest{
 #' full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
 #'  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 #'
@@ -116,7 +118,8 @@
 #' }
 find_bayes_estimate <- function(partitions, burn_in, L_FNM = 1, L_FM1 = 1,
                                 L_FM2 = 2, L_A = Inf,
-                                max_cc_size = nrow(partitions)){
+                                max_cc_size = nrow(partitions),
+                                verbose = TRUE){
     # Input checks
     if(!is.numeric(L_FNM)){
         stop("'L_FNM' must be numeric")
@@ -143,12 +146,12 @@ find_bayes_estimate <- function(partitions, burn_in, L_FNM = 1, L_FM1 = 1,
         stop("'L_A' must be positive")
     }
     if(!is.infinite(L_A) & max_cc_size > 15){
-        print("Finding partial Bayes estimate may take a long time when maximum
-              connected component is size > 15")
+        warning("Finding partial Bayes estimate may take a long time when
+                maximum connected component is size > 15")
     }
     if(is.infinite(L_A) & max_cc_size > 100){
-        print("Finding full Bayes estimate may take a long time when maximum
-              connected component is size > 100")
+        warning("Finding full Bayes estimate may take a long time when maximum
+                connected component is size > 100")
     }
 
     n_iter <- ncol(partitions)
@@ -171,8 +174,11 @@ find_bayes_estimate <- function(partitions, burn_in, L_FNM = 1, L_FM1 = 1,
         ccs <- igraph::components(g)
     }
 
-    print(paste0("Finding Bayes estimate with a threshold of ", thresh,
-                 " and a maximum connected component of size ", max(ccs$csize)))
+    if(verbose){
+        print(paste0("Finding Bayes estimate with a threshold of ", thresh,
+                     " and a maximum connected component of size ",
+                     max(ccs$csize)))
+    }
 
     relabel_partition <- function(sample){
         iterlabels <- unique(sample)

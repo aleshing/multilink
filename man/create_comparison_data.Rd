@@ -4,7 +4,14 @@
 \alias{create_comparison_data}
 \title{Create Comparison Data}
 \usage{
-create_comparison_data(records, types, breaks, file_sizes, duplicates)
+create_comparison_data(
+  records,
+  types,
+  breaks,
+  file_sizes,
+  duplicates,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{records}{A \code{data.frame} containing the records to be linked, where
@@ -43,6 +50,9 @@ to have duplicates. \code{duplicates[k]} should be \code{1} if file \code{k}
 has duplicates, and \code{duplicates[k]} should be \code{0} if file \code{k}
 has no duplicates. If any files do not have duplicates, we strongly recommend
 that the largest such file is organized to be the first file.}
+
+\item{verbose}{A \code{logical} indicator of whether progress messages should
+be print (default \code{TRUE}).}
 }
 \value{
 a list containing:

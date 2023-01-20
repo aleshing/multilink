@@ -11,7 +11,8 @@ find_bayes_estimate(
   L_FM1 = 1,
   L_FM2 = 2,
   L_A = Inf,
-  max_cc_size = nrow(partitions)
+  max_cc_size = nrow(partitions),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -39,6 +40,9 @@ budget. When \code{!is.infinite(L_A)}, we recommend setting this argument to
 \code{10-12}, then increasing based on a computational budget (although an
 increase of \code{1} in this argument can in the worst case lead to a
 doubling in computation time).}
+
+\item{verbose}{A \code{logical} indicator of whether progress messages should
+be print (default \code{TRUE}).}
 }
 \value{
 A vector, the same length of a column of \code{partitions} containing the
@@ -80,11 +84,11 @@ pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
 Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 
 # Run the Gibbs sampler
-\dontrun{
 results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
  Z_init = Z_init, seed = 42)
 
 # Find the full Bayes estimate
+\donttest{
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 
@@ -120,11 +124,11 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_pars = NA)
 
 # Run the Gibbs sampler
-\dontrun{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 
 # Find the full Bayes estimate
+\donttest{
 full_estimate <- find_bayes_estimate(results$partitions, burn_in = 100,
  L_FNM = 1, L_FM1 = 1, L_FM2 = 2, L_A = Inf, max_cc_size = 50)
 

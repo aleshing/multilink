@@ -64,7 +64,7 @@
 #'  n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
+#' {
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #'
@@ -85,7 +85,7 @@
 #'
 #' # Add columns to the records corresponding to their full and partial
 #' # Bayes estimates
-#' dup_data$records <- cbind(dup_data$records,
+#' dup_data_small$records <- cbind(dup_data_small$records,
 #'  full_estimate_id = full_estimate_relabel$link_id,
 #'  partial_estimate_id = partial_estimate_relabel$link_id)
 #' }

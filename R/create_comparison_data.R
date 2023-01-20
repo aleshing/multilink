@@ -62,8 +62,8 @@
 #' has duplicates, and \code{duplicates[k]} should be \code{0} if file \code{k}
 #' has no duplicates. If any files do not have duplicates, we strongly recommend
 #' that the largest such file is organized to be the first file.
-# @param K The number of files, assumed to be of class \code{numeric}. This
-# should equal the length of file sizes. K = length(file_sizes)
+#' @param verbose A \code{logical} indicator of whether progress messages should
+#' be print (default \code{TRUE}).
 #' @return a list containing:
 #' \describe{
 #'   \item{\code{record_pairs}}{A \code{data.frame}, where each row
@@ -144,7 +144,7 @@
 #'  file_sizes = dup_data_small$file_sizes,
 #'  duplicates = c(1, 1, 1))
 create_comparison_data <- function(records, types, breaks, file_sizes,
-                                   duplicates){
+                                   duplicates, verbose = TRUE){
     # Input Checks
     if(!is.data.frame(records)){ stop("'records' is not a data frame") }
     if(length(types) != ncol(records)){
@@ -274,8 +274,10 @@ create_comparison_data <- function(records, types, breaks, file_sizes,
     field_names <- colnames(records)
     names(field_levels) <- field_names
     for(f in 1:FF){
-        print(paste0("Creating comparison data for field ",
-                     colnames(records)[f]))
+        if(verbose){
+            print(paste0("Creating comparison data for field ",
+                         colnames(records)[f]))
+        }
         if(types[f] == "bi"){
             raw_comp <- records[rps1, f] != records[rps2, f]
             comparisons[, f] <- as.numeric(raw_comp) + 1

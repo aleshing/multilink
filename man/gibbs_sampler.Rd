@@ -11,7 +11,8 @@ gibbs_sampler(
   Z_init = 1:sum(comparison_list$file_sizes),
   seed = 70,
   single_likelihood = FALSE,
-  chaperones_info = NA
+  chaperones_info = NA,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -55,6 +56,9 @@ version, or \code{1} if using the partial version. \code{extra_gibbs} is a
 done after the Chaperones updates, at each iteration of the Gibbs sampler.
 \code{num_restrict} is the number of restricted Gibbs steps to take during
 each Chaperones update to the partition.}
+
+\item{verbose}{A \code{logical} indicator of whether progress messages should
+be print (default \code{TRUE}).}
 }
 \value{
 a list containing:
@@ -89,7 +93,7 @@ records, conditional on the comparison data created using
 \code{\link{create_comparison_data}} or \code{\link{reduce_comparison_data}}.
 }
 \examples{
-#' # Example with small no duplicate dataset
+# Example with small no duplicate dataset
 data(no_dup_data_small)
 
 # Create the comparison data
@@ -115,7 +119,7 @@ pairs_to_keep <- (comparison_list$comparisons[, "gname_DL_3"] != TRUE) &
 Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 
 # Run the Gibbs sampler
-\dontrun{
+{
 results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
  Z_init = Z_init, seed = 42)
 }
@@ -147,7 +151,7 @@ prior_list <- specify_prior(reduced_comparison_list, mus = NA, nus = NA,
  n_prior_pars = NA)
 
 # Run the Gibbs sampler
-\dontrun{
+{
 results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
  seed = 42)
 }

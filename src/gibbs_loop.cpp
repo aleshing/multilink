@@ -26,7 +26,7 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
                           const arma::umat& valid_fp_matrix, const arma::vec& fp_probs,
                           List comparison_rps, int comparison_rps_length,
                           int extra_gibbs, int num_restrict, const arma::umat& comparisons_chap,
-                          const arma::vec& comparison_rps_probs){
+                          const arma::vec& comparison_rps_probs, int verbose){
     for(int i = 1; i < n_iter; i++){
         //// Every 10 iterations check to see if the user has interrupted the
         //// sampler
@@ -34,8 +34,10 @@ List gibbs_loop_rcpp(int n_iter, arma::mat Z_samp, arma::mat clust_sizes_samp,
             checkUserInterrupt();
         }
         if(i % 100 == 0 || i == 1){
-            Rcout << "Beginning iteration " << i << "/" << n_iter - 1 <<
-                std::endl;
+            if(verbose == 1){
+                Rcout << "Beginning iteration " << i << "/" << n_iter - 1 <<
+                    std::endl;
+            }
         }
 
         //// Inner Gibbs loop: Fixed scan of comparison data model parameters

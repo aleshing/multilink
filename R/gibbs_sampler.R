@@ -42,6 +42,8 @@
 #' done after the Chaperones updates, at each iteration of the Gibbs sampler.
 #' \code{num_restrict} is the number of restricted Gibbs steps to take during
 #' each Chaperones update to the partition.
+#' @param verbose A \code{logical} indicator of whether progress messages should
+#' be print (default \code{TRUE}).
 #'
 #' @return a list containing:
 #' \describe{
@@ -75,7 +77,8 @@
 #' \emph{Advances in neural information processing systems}. [\href{https://proceedings.neurips.cc/paper/2016/hash/670e8a43b246801ca1eaca97b3e19189-Abstract.html}{Published}] [\href{https://arxiv.org/abs/1610.09780}{arXiv}]
 #' @export
 #'
-#' @examples#' # Example with small no duplicate dataset
+#' @examples
+#' # Example with small no duplicate dataset
 #' data(no_dup_data_small)
 #'
 #' # Create the comparison data
@@ -101,7 +104,7 @@
 #' Z_init <- initialize_partition(comparison_list, pairs_to_keep, seed = 42)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
+#' {
 #' results <- gibbs_sampler(comparison_list, prior_list, n_iter = 1000,
 #'  Z_init = Z_init, seed = 42)
 #' }
@@ -133,14 +136,14 @@
 #'  n_prior_pars = NA)
 #'
 #' # Run the Gibbs sampler
-#' \dontrun{
+#' {
 #' results <- gibbs_sampler(reduced_comparison_list, prior_list, n_iter = 1000,
 #'  seed = 42)
 #' }
 gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
-                               Z_init = 1:sum(comparison_list$file_sizes),
-                               seed = 70, single_likelihood = FALSE,
-                               chaperones_info = NA){
+                          Z_init = 1:sum(comparison_list$file_sizes),
+                          seed = 70, single_likelihood = FALSE,
+                          chaperones_info = NA, verbose = TRUE){
     # Input checks
     if(length(Z_init) != sum(comparison_list$file_sizes)){
         stop("'length(Z_init)' and 'sum(comparison_list$file_sizes)' must be the
@@ -157,7 +160,9 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
                 used in specify_prior.")
     }
     if(sum(is.na(chaperones_info)) > 0){
-        print("Running Gibbs sampler with Gibbs updates to partition.")
+        if(verbose){
+            print("Running Gibbs sampler with Gibbs updates to partition.")
+        }
         chap_type <- -1
         num_chap_iter <- NA
         nonuniform_chap_type <- 1
@@ -174,15 +179,17 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
         extra_gibbs <- chaperones_info$extra_gibbs
         num_restrict <- chaperones_info$num_restrict
         if(chap_type == 0){
-            print("Running Gibbs sampler with Chaperones updates to partition,
-                  uniform Chaperones distribution.")
-            nonuniform_chap_type <- 1
+            if(verbose){
+                print("Running Gibbs sampler with Chaperones updates to
+                        partition, uniform Chaperones distribution.")
+            }
+            nonuniform_chap_type <- 0
         }
-        else if(chap_type == 1 & nonuniform_chap_type == 0){
+        else if(chap_type == 1 & nonuniform_chap_type == 0 & verbose){
             print("Running Gibbs sampler with Chaperones updates to partition,
                   nonuniform Chaperones distribution (exact).")
         }
-        else if(chap_type == 1 & nonuniform_chap_type == 1){
+        else if(chap_type == 1 & nonuniform_chap_type == 1 & verbose){
             print("Running Gibbs sampler with Chaperones updates to partition,
                   nonuniform Chaperones distribution (partial).")
         }
@@ -192,7 +199,9 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     }
 
     # Progress
-    print("Processing inputs")
+    if(verbose){
+        print("Processing inputs")
+    }
 
     # Dump the contents of comparison_list
     # Converted record_pairs to a matrix for Rcpp
@@ -470,31 +479,36 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     set.seed(seed)
 
     # Progress
-    print("Beginning sampling")
+    if(verbose){
+        print("Beginning sampling")
+    }
     # Keep track of time
     start <- Sys.time()
 
     gibbs_output <- gibbs_loop_rcpp(n_iter, Z_samp, clust_sizes_samp, cont_samp,
-                                         m_samp, u_samp, mus, nus, alphas, alpha_0,
-                                         dup_upper_bound, log_dup_count_prior,
-                                         log_n_prior, cont, clust_sizes, n, ab,
-                                         comparisons, record_pairs, flat, r, r_1,
-                                         valid_rp, singleton_ind, rp_ind,
-                                         file_labels, powers, L, num_fp, num_rp,
-                                         FF, rp_to_fp, level_cum, no_dups, valid_fp,
-                                         cc, Z_members, clust_sizes_collapsed,
-                                         indexing_used, single_likelihood,
-                                         single_nus, single_ab,
-                                         num_chap_iter, chap_type, file_size_cum,
-                                         valid_fp_matrix, fp_probs,
-                                         comparison_rps, length(comparison_rps), extra_gibbs,
-                                         num_restrict, comparisons_chap, comparison_rps_probs)
+                                    m_samp, u_samp, mus, nus, alphas, alpha_0,
+                                    dup_upper_bound, log_dup_count_prior,
+                                    log_n_prior, cont, clust_sizes, n, ab,
+                                    comparisons, record_pairs, flat, r, r_1,
+                                    valid_rp, singleton_ind, rp_ind,
+                                    file_labels, powers, L, num_fp, num_rp,
+                                    FF, rp_to_fp, level_cum, no_dups, valid_fp,
+                                    cc, Z_members, clust_sizes_collapsed,
+                                    indexing_used, single_likelihood,
+                                    single_nus, single_ab,
+                                    num_chap_iter, chap_type, file_size_cum,
+                                    valid_fp_matrix, fp_probs,
+                                    comparison_rps, length(comparison_rps),
+                                    extra_gibbs, num_restrict, comparisons_chap,
+                                    comparison_rps_probs, verbose)
 
     # Keep track of time
     end <- Sys.time()
     sampling_time <- as.numeric(end-start, units = "secs")
     # Progress
-    print(paste0("Finished sampling in ", sampling_time, " seconds"))
+    if(verbose){
+        print(paste0("Finished sampling in ", sampling_time, " seconds"))
+    }
 
     # Return the posterior samples and the derived contingency tables and
     # cluster sizes, removing the first column
