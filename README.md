@@ -18,7 +18,14 @@ have duplicates.
 
 ## Installation
 
-You can install the released version of multilink from GitHub with:
+The package is now available on CRAN:
+
+``` r
+install.packages("multilink")
+```
+
+You can also install the development version of multilink from GitHub
+with:
 
 ``` r
 install.packages("devtools")
