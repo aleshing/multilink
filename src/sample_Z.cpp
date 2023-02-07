@@ -70,7 +70,7 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                    int alpha_0, const arma::vec& dup_upper_bound,
                    List dup_count_prior, const arma::vec& n_prior, int r,
                    int r_1, const arma::mat& valid_rp,
-                   const arma::vec& singleton_ind, const arma::umat& rp_ind,
+                   const arma::vec& singleton_ind, const arma::mat& rp_ind,
                    const arma::vec& file_labels, const arma::vec& powers,
                    int flat, int no_dups, int cc, arma::umat Z_members,
                    arma::vec clust_sizes_collapsed, int indexing_used){
@@ -280,9 +280,9 @@ List sample_Z_rcpp(arma::vec Z, arma::mat clust_sizes, int n, arma::vec cont,
                 }
 
                 // Add the likelihood contribution
-                arma::uvec pairs = rp_ind.col(j);
+                arma::uvec pairs = arma::conv_to<arma::uvec>::from(rp_ind.col(j));
                 pairs = pairs.elem(records) - 1;
-                if(sum(pairs < 0) > 0){
+                if(sum(pairs <0) > 0){
                     Rcout << "Something went wrong, not getting the correct\
                     record pairs" << j << std::endl;
                 }
@@ -402,7 +402,7 @@ List sample_Z_rcpp_chaperones(arma::vec Z, arma::mat clust_sizes, int n, arma::v
                               int alpha_0, const arma::vec& dup_upper_bound,
                               List dup_count_prior, const arma::vec& n_prior, int r,
                               int r_1, const arma::mat& valid_rp,
-                              const arma::vec& singleton_ind, const arma::umat& rp_ind,
+                              const arma::vec& singleton_ind, const arma::mat& rp_ind,
                               const arma::vec& file_labels, const arma::vec& powers,
                               int flat, int no_dups, int cc, arma::umat Z_members,
                               arma::vec clust_sizes_collapsed, int indexing_used,
@@ -629,7 +629,7 @@ List sample_Z_rcpp_chaperones(arma::vec Z, arma::mat clust_sizes, int n, arma::v
                             }
 
                             // Add the likelihood contribution
-                            arma::uvec pairs = rp_ind.col(j);
+                            arma::uvec pairs = arma::conv_to<arma::uvec>::from(rp_ind.col(j));
                             pairs = pairs.elem(records) - 1;
                             if(sum(pairs < 0) > 0){
                                 Rcout << "Something went wrong, not getting the correct\
