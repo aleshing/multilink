@@ -1,22 +1,14 @@
 ## Resubmission
-This is a resubmission. In this version I have:
+This is a resubmission. In this version I have fixed the clang-UBSAN related
+additional issue that arose during CRAN package checks. 
 
-* Removed the \dontrun{} calls from all examples. When checking the 
-package at https://win-builder.r-project.org/, two examples, in  
-R/find_bayes_estimate.R and R/multilink-package.R, took longer than 5 sec to
-execute without \dontrun or \donttest calls. I have thus wrapped portions of 
-these examples with \donttest{} calls. When rechecking the 
-package at https://win-builder.r-project.org/ with these changes all examples
-executed in < 5 sec. If any examples take longer than 5 sec to execute on this 
-submission I am happy to shorten the execution times and resubmit.
-
-* Added verbose arguments to R/create_comparison_data.R,
-R/find_bayes_estimate.R, and R/gibbs_sampler.R, that wrap all print statements
-in these functions. When verbose is set to FALSE, all print statements are 
-suppressed for the given function. I have set the default for the verbose 
-arguments to TRUE, as these functions can take some time to run for moderate 
-sized data sets, and thus progress messages are important for users to know when 
-to expect the functions to finish running.
+As described in an email to the CRAN team, on the MacOS architectures, the CHECK 
+returns a NOTE because the libs subdirectory is then above the 1MB threshold. 
+However, it seems that this NOTE only appears under MacOS but not under Windows 
+or Linux. My understanding is that the libs subdirectory is large due to the 
+use of Rcpp. Some functions of the multilink package have been written in C++ 
+using Rcpp to perform MCMC. Without the speed up gained from those C++ 
+functions, this package would become impractical. 
 
 ## R CMD check results
 There were no ERRORs, WARNINGs or NOTEs.

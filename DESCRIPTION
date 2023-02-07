@@ -1,6 +1,6 @@
 Package: multilink
 Title: Multifile Record Linkage and Duplicate Detection
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Serge",
            family = "Aleshin-Guendel",

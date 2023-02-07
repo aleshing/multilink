@@ -342,7 +342,10 @@ gibbs_sampler <- function(comparison_list, prior_list, n_iter = 2000,
     # rp_ind: the indices of record pairs in the comparison data. rp_ind[i, j]
     # gives the row index of comp_data where records i and j are compared, or -1
     # if the records aren't being compared
-    rp_ind <- matrix(-1, nrow = r, ncol = r)
+    # rp_ind <- matrix(-1, nrow = r, ncol = r)
+    # rp_ind gets passed into C++ as a umat, so -1 can cause errors to get
+    # thrown during, even if these values are never actually accessed.
+    rp_ind <- matrix(num_rp + 1, nrow = r, ncol = r)
     for(rp in 1:num_rp){
         i <- record_pairs[rp, 1]
         j <- record_pairs[rp, 2]
