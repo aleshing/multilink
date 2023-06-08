@@ -1,5 +1,6 @@
 ## Resubmission
-This is a resubmission. In this version I have fixed the clang-UBSAN related
+This is a resubmission. The previous version was archived for not correcting 
+issues on time. In this version I have fixed the clang-UBSAN related
 additional issue that arose during CRAN package checks, and have removed the 
 requirement of C++11.
 
