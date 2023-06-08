@@ -23,8 +23,7 @@ have duplicates.
 <!--install.packages("multilink")-->
 <!--```-->
 
-You can also install the development version of multilink from GitHub
-with:
+You can install the development version of multilink from GitHub with:
 
 ``` r
 install.packages("devtools")

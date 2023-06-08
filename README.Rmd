@@ -27,7 +27,7 @@ multilink is an R package which implements methodology presented in the manuscri
 <!--install.packages("multilink")-->
 <!--```-->
 
-You can also install the development version of multilink from GitHub with:
+You can install the development version of multilink from GitHub with:
 ``` r
 install.packages("devtools")
 devtools::install_github("aleshing/multilink")

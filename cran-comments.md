@@ -1,6 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have fixed the clang-UBSAN related
-additional issue that arose during CRAN package checks. 
+additional issue that arose during CRAN package checks, and have removed the 
+requirement of C++11.
 
 As described in an email to the CRAN team, on the MacOS architectures, the CHECK 
 returns a NOTE because the libs subdirectory is then above the 1MB threshold. 
