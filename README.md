@@ -18,10 +18,11 @@ have duplicates.
 
 ## Installation
 
-<!--The package is now available on CRAN:-->
-<!--``` r-->
-<!--install.packages("multilink")-->
-<!--```-->
+The package is now available on CRAN:
+
+``` r
+install.packages("multilink")
+```
 
 You can install the development version of multilink from GitHub with:
 
