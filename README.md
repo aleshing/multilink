@@ -6,15 +6,18 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-multilink is an R package which implements methodology presented in the
-manuscript “Multifile Partitioning for Record Linkage and Duplicate
-Detection” by Serge Aleshin-Guendel and Mauricio Sadinle, published in
-the [Journal of the American Statistical
+`multilink` is an `R` package which performs Bayesian probabilistic
+record linkage. It handles the general problem of multifile record
+linkage and duplicate detection, where any number of files are to be
+linked, and any of the files may have duplicates. `multilink` implements
+methodology presented in the manuscript “Multifile Partitioning for
+Record Linkage and Duplicate Detection” by Serge Aleshin-Guendel and
+Mauricio Sadinle, published in the [Journal of the American Statistical
 Association](https://doi.org/10.1080/01621459.2021.2013242) and
-available on [arXiv](https://arxiv.org/abs/2110.03839v1). It handles the
-general problem of multifile record linkage and duplicate detection,
-where any number of files are to be linked, and any of the files may
-have duplicates.
+available on [arXiv](https://arxiv.org/abs/2110.03839v1). For more
+information on using `multilink`, please see the
+[`multilink_tutorial`](https://github.com/aleshing/multilink_tutorial/tree/main)
+github repository.
 
 ## Installation
 
